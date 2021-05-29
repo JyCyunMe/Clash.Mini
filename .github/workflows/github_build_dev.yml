@@ -1,4 +1,4 @@
-name: Build Dev
+name: Build Dev Windows
 on:
   push:
     branches:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-and-upload:
-    name: Build & Upload Dev
+    name: Build & Upload Dev Windows
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
     steps:
@@ -29,10 +29,17 @@ jobs:
       - name: Get Git Info 💡
         shell: pwsh
         run: |
+          $VERSION_REGEXP='^v?\d+\.\d+\.\d+(\.\d+)?-pre$'
+          echo "VERSION_REGEXP=$VERSION_REGEXP" >> $env:GITHUB_ENV
           $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
           echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
           echo "Current Branch: $GIT_BRANCH"
-          $GIT_TAG_LATEST=git tag -l 'v*.*.*' | Sort-Object -Descending -Top 1
+          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
+            sort -descending -top 1)
+          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
+            sort -descending -top 1)
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo ($GIT_TAG_LATEST=$GIT_TAG_VERSION) }
+            else { echo ($GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1) }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
 
@@ -46,16 +53,15 @@ jobs:
           $BUILD_VERSION=cat .\versioninfo.json | jq -r '.StringFileInfo.ProductVersion'
           echo "BUILD_VERSION=$BUILD_VERSION" >> $env:GITHUB_ENV
           echo "Build Version: $BUILD_VERSION"
+          $GIT_TAG="$BUILD_VERSION$(${env:GIT_BRANCH} -ne 'release' ? '-pre' : '')"
+          echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
+          echo "Current Tag: $GIT_TAG"
 
-      # 构建前检查
-      - name: Check on Failures ❌
-        if: ${{ env.GIT_TAG_LATEST != '' && env.GIT_TAG_LATEST >= env.BUILD_VERSION }}
-        shell: pwsh
-        run: |
-          echo "A newer or the current version already exists."
-          echo "Latest Tag: $env:GIT_TAG_LATEST, Build Version: $env:BUILD_VERSION"
-          echo "This build has been cancelled."
-          exit 1
+      #      # 构建前检查
+      #      - name: Check on Failures ❌
+      #        if: success()
+      #        shell: pwsh
+      #        run: |
 
       # 配置Golang环境
       - name: Setup Go Environment 📍
@@ -85,7 +91,7 @@ jobs:
         run: |
           $env:GOOS="windows"
           $env:GOARCH="amd64"
-          go build -a -v -x -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_dev_x64.exe
+          go build -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_dev_x64.exe
 
       # 构建32位应用
       - name: Build x86 Application 🛠
