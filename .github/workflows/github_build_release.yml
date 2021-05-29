@@ -53,8 +53,8 @@ jobs:
           echo "BUILD_VERSION=$BUILD_VERSION" >> $env:GITHUB_ENV
           echo "Build Version: $BUILD_VERSION"
           $GIT_TAG="$BUILD_VERSION$(${env:GIT_BRANCH} -ne 'release' ? '-pre' : '')"
-          echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
-          echo "Current Tag: GIT_BRANCH"
+          echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
+          echo "Current Tag: $GIT_TAG"
 
       # 构建前检查
       - name: Check on Failures ❌
@@ -185,7 +185,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ env.GIT_BRANCH != 'release' }}
-          tag: ${{ env.BUILD_VERSION }}
+          tag: ${{ env.GIT_TAG }}
           artifacts: ${{ env.BUILD_PATH }}\publish\Clash.Mini*.7z
           #          bodyFile: .\CHANGELOG.md
           bodyFile: .\RELEASELOG.md
