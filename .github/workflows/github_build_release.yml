@@ -101,10 +101,20 @@ jobs:
 
           if (($NOT_PASSED -eq 0) -and (($productVersion -ne $fileVersion) -or (${env:BUILD_VERSION} -ne $productVersion))) {
             $NOT_PASSED=1
-            echo "The version information has some differences.`nPlease check `versioninfo.json`"
+            echo "The version information has some differences.`nPlease check `"versioninfo.json`""
           }
 
-          exit 1
+          if (($NOT_PASSED -eq 0) -and ((${env:GIT_TAG_LATEST} -ne '' -and ${env:GIT_TAG}.replace('-pre', '') -lt ${env:GIT_TAG_LATEST}.replace('-pre', '') -or
+            (${env:GIT_TAG}.replace('-pre', '') -eq ${env:GIT_TAG_LATEST}.replace('-pre', '') -and (${env:GIT_TAG}.contains('-pre') -or !${env:GIT_TAG_LATEST}.contains('-pre')))))) {
+              $NOT_PASSED=1
+              echo "A newer or the current version already exists."
+          }
+          if ($NOT_PASSED -ge 0) {
+            echo "Check the version information is not passed."
+            echo "This build has been aborted."
+            exit 1
+          }
+
 
       # 配置Golang环境
       - name: Setup Go Environment 📍
