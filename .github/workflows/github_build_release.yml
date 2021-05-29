@@ -167,13 +167,13 @@ jobs:
           echo "PUBLISH_PATH_X64=$PUBLISH_PATH_X64" >> $env:GITHUB_ENV
           echo "PUBLISH_PATH_X86=$PUBLISH_PATH_X86" >> $env:GITHUB_ENV
           mkdir -p .\Profile
-          $packageFiles=@("Profile", "config.yaml", "Country.mmdb")
+          $packageFiles=@(".\Profile", "..\config.yaml", "..\Country.mmdb")
           mv .\publish\Clash.Mini*64.exe $PUBLISH_PATH_X64\Clash.Mini.exe
           $filesX64=$packageFiles
-          foreach ($file in $filesX64) { cp .\$file $PUBLISH_PATH_X64\ }
+          foreach ($file in $filesX64) { cp $file $PUBLISH_PATH_X64\ }
           mv .\publish\Clash.Mini*86.exe $PUBLISH_PATH_X86\Clash.Mini.exe
           $filesX86=$packageFiles
-          foreach ($file in $filesX86) { cp .\$file $PUBLISH_PATH_X86\ }
+          foreach ($file in $filesX86) { cp $file $PUBLISH_PATH_X86\ }
 
       # 压缩打包
       - name: Compression x64 📦
