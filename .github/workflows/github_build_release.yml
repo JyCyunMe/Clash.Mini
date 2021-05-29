@@ -38,12 +38,15 @@ jobs:
           $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
           echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
           echo "Current Branch: $GIT_BRANCH"
-          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
-            sort -descending -top 1)
-          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
-            sort -descending -top 1)
-          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo ($GIT_TAG_LATEST=$GIT_TAG_VERSION) }
-            else { echo ($GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1) }
+
+          $SHORT_SHA=${env:GITHUB_SHA}.Substring(0,7)
+          echo "SHORT_SHA=$SHORT_SHA" >> $env:GITHUB_ENV
+          echo "Current commit hash id: ${env:GITHUB_SHA} ($SHORT_SHA)"
+
+          $GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
+          $GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { $GIT_TAG_LATEST=$GIT_TAG_VERSION }
+            else { $GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1 }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
 
@@ -61,11 +64,57 @@ jobs:
           echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
           echo "Current Tag: $GIT_TAG"
 
-      #      # 构建前检查
-      #      - name: Check on Failures ❌
-      #        if: success()
-      #        shell: pwsh
-      #        run: |
+      # 构建前检查
+      - name: Check on Failures ❌
+        if: success()
+        shell: pwsh
+        run: |
+          $NOT_PASSED=0
+          echo "Build Version: ${env:BUILD_VERSION}`nCurrent Tag: ${env:GIT_TAG}`nLatest Tag: ${env:GIT_TAG_LATEST}`n"
+          if (!(${env:GIT_TAG} -match ${env:VERSION_REGEXP}) -or ${env:GIT_TAG} -eq '') {
+            $NOT_PASSED=1
+            echo "Cannot get the version information."
+          }
+
+          if ($NOT_PASSED -eq 0) {
+            $INTERNAL_VERSION_REGEXP='^(\d+\.\d+\.\d+)(\.\d+)?$'
+            $fileVersion=cat .\versioninfo.json | jq -r '.FixedFileInfo.FileVersion'
+            $fileVersion=(echo $fileVersion | jq -r '.Major, .Minor, .Patch, .Build') -join '.'
+            $fileVersion=[regex]::Match($fileVersion, $INTERNAL_VERSION_REGEXP)
+            if (!$fileVersion.success) {
+              $NOT_PASSED=-1
+            } else {
+              $fileVersion=$fileVersion.Groups[1].Value
+            }
+
+            if ($NOT_PASSED -eq 0) {
+              $productVersion=cat .\versioninfo.json | jq -r '.FixedFileInfo.ProductVersion'
+              $productVersion=(echo $productVersion | jq -r '.Major, .Minor, .Patch, .Build') -join '.'
+              $productVersion=[regex]::Match($productVersion, $INTERNAL_VERSION_REGEXP)
+              if (!$productVersion.success) {
+                $NOT_PASSED=-1
+              } else {
+                $productVersion=$productVersion.Groups[1].Value
+              }
+            }
+          }
+
+          if (($NOT_PASSED -eq 0) -and (($productVersion -ne $fileVersion) -or (${env:BUILD_VERSION} -ne $productVersion))) {
+            $NOT_PASSED=1
+            echo "The version information has some differences.`nPlease check `versioninfo.json`"
+          }
+
+          if (($NOT_PASSED -eq 0) -and ((${env:GIT_TAG_LATEST} -ne '' -and ${env:GIT_TAG}.replace('-pre', '') -lt ${env:GIT_TAG_LATEST}.replace('-pre', '') -or
+            (${env:GIT_TAG}.replace('-pre', '') -eq ${env:GIT_TAG_LATEST}.replace('-pre', '') -and (${env:GIT_TAG}.contains('-pre') -or !${env:GIT_TAG_LATEST}.contains('-pre')))))) {
+              $NOT_PASSED=1
+              echo "A newer or the current version already exists."
+          }
+          if ($NOT_PASSED -ge 0) {
+            echo "Check the version information is not passed."
+            echo "This build has been aborted."
+            exit 1
+          }
+
 
       # 配置Golang环境
       - name: Setup Go Environment 📍
@@ -82,6 +131,8 @@ jobs:
         run: |
           go version
           go env
+          go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+          go generate -x
           mkdir -p .\build
 
       # 运行Golang测试
