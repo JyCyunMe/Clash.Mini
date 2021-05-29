@@ -1,0 +1,186 @@
+name: Build Release
+on:
+  push:
+    branches:
+      - release
+      - pre-release
+  pull_request:
+    branches:
+      - release
+      - pre-release
+#    tags:
+#      - 'v*.*.*'
+
+env:
+  go-version: '^1.16.4'
+  go-stable: 'true'
+  artifact-retention-days: 5
+
+jobs:
+  build-and-publish:
+    name: Build & Publish (Pre)Release
+    runs-on: windows-latest
+    if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
+    steps:
+      # 拉取项目代码
+      - name: Checkout 🔀
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # 获取Git信息
+      - name: Get Git Info 💡
+        shell: pwsh
+        run: |
+          $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
+          echo "Current Branch: $GIT_BRANCH"
+          $GIT_TAG_LATEST=git tag -l 'v*.*.*' | Sort-Object -Descending -Top 1
+          echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
+          echo "Latest Tag: $GIT_TAG_LATEST"
+
+      # 配置构建信息
+      - name: Configurate Build Information 🖨
+        if: success()
+        shell: pwsh
+        run: |
+          $BUILD_PATH="$pwd\build"
+          echo "BUILD_PATH=$BUILD_PATH" >> $env:GITHUB_ENV
+          $BUILD_VERSION=cat .\versioninfo.json | jq -r '.StringFileInfo.ProductVersion'
+          echo "BUILD_VERSION=$BUILD_VERSION" >> $env:GITHUB_ENV
+          echo "Build Version: $BUILD_VERSION"
+
+      # 构建前检查
+      - name: Check on Failures ❌
+        if: ${{ env.GIT_TAG_LATEST != '' && env.GIT_TAG_LATEST >= env.BUILD_VERSION }}
+        shell: pwsh
+        run: |
+          echo "A newer or the current version already exists."
+          echo "Latest Tag: $env:GIT_TAG_LATEST, Build Version: $env:BUILD_VERSION"
+          echo "This build has been cancelled."
+          exit 1
+
+      # 配置Golang环境
+      - name: Setup Go Environment 📍
+        uses: actions/setup-go@v2
+        if: success()
+        with:
+          go-version: ${{ env.go-version }}
+          stable: ${{ env.go-stable }}
+
+      # 获取依赖包
+      - name: Get Go Modules 📟
+        if: success()
+        shell: pwsh
+        run: |
+          go version
+          go env
+          mkdir -p .\build
+
+      # 运行Golang测试
+      #  - name: Golang Test ✅
+      #      run: |
+
+      # 构建64位应用
+      - name: Build x64 Application 🛠
+        if: success()
+        shell: pwsh
+        run: |
+          $env:GOOS="windows"
+          $env:GOARCH="amd64"
+          go build -a -v -x -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_release_x64.exe
+
+      # 构建32位应用
+      - name: Build x86 Application 🛠
+        if: success()
+        shell: pwsh
+        run: |
+          $env:GOOS="windows"
+          $env:GOARCH="386"
+          go build -a -v -x -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_release_x86.exe
+
+      # 准备发布PreRelease文件
+      - id: prepare-pre-release
+        name: Prepare to Publish PreRelease 🕹
+        if: ${{ env.GIT_BRANCH != 'release' && success() }}
+        shell: pwsh
+        run: |
+          cd $env:BUILD_PATH
+          mkdir -p .\publish
+          $BUILD_X64_FILENAME="Clash.Mini_${env:GIT_BRANCH}_${env:BUILD_VERSION}_x64.exe"
+          $BUILD_X86_FILENAME="Clash.Mini_${env:GIT_BRANCH}_${env:BUILD_VERSION}_x86.exe"
+          echo "BUILD_X64_FILENAME=$BUILD_X64_FILENAME" >> $env:GITHUB_ENV
+          echo "BUILD_X86_FILENAME=$BUILD_X86_FILENAME" >> $env:GITHUB_ENV
+          cp .\Clash.Mini_release_*.exe .\publish\
+          echo "Ready to upload the following file(s):"
+          ls .\publish
+
+      # 上传64位应用到Actions Artifacts
+      - name: Upload x64 Application to Artifacts 📤
+        if: ${{ steps.prepare-pre-release.outcome == 'success' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILD_X64_FILENAME }}
+          path: ${{ env.BUILD_PATH }}\publish\*_x64.exe
+          if-no-files-found: error
+          retention-days: ${{ env.artifact-retention-days }}
+
+      # 上传32位应用到Actions Artifacts
+      - name: Upload x86 Application to Artifacts 📤
+        if: ${{ steps.prepare-pre-release.outcome == 'success' && success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILD_X86_FILENAME }}
+          path: ${{ env.BUILD_PATH }}\publish\*_x86.exe
+          if-no-files-found: error
+          retention-days: ${{ env.artifact-retention-days }}
+
+      # 准备发布Release文件
+      - name: Prepare to Publish Release 🕹
+        if: ${{ env.GIT_BRANCH == 'release' && success() }}
+        shell: pwsh
+        run: |
+          cd $env:BUILD_PATH
+          mkdir -p .\publish
+          $BUILD_X64_FILENAME="Clash.Mini_${env:BUILD_VERSION}_x64.exe"
+          $BUILD_X86_FILENAME="Clash.Mini_${env:BUILD_VERSION}_x86.exe"
+          echo "BUILD_X64_FILENAME=$BUILD_X64_FILENAME" >> $env:GITHUB_ENV
+          echo "BUILD_X86_FILENAME=$BUILD_X86_FILENAME" >> $env:GITHUB_ENV
+          cp .\Clash.Mini_release_*.exe .\publish\
+          echo "Ready to upload the following file(s):"
+          ls .\publish -Include 'Clash.Mini_release_*.exe' -Recurse | ForEach-Object { Rename-Item $_.FullName $_.FullName.Replace('_release', '') }
+          echo "Prepare to compression"
+          mkdir -p .\publish\x64
+          mkdir -p .\publish\x86
+          $packageFiles@("Profile","config.yaml","Country.mmdb")
+          $filesX64=$packageFiles + "publish\Clash.Mini*64.exe"
+          foreach ($file in $filesX64){ cp .\$file .\build\publish\x64\ }
+          $filesX86=$packageFiles + "publish\Clash.Mini*86.exe"
+          foreach ($file in $filesX86){ cp .\$file .\build\publish\x86\ }
+
+      # 准备64位压缩包
+      - name: Compression x64 📦
+        if: success()
+        uses: edgarrc/action-7z@v1
+        with:
+          args: 7z a -t7z -mx=9 ${{ env.BUILD_VERSION }}.7z .\build\publish\x64\*
+
+      # 准备32位压缩包
+      - name: Compression x86 📦
+        if: success()
+        uses: edgarrc/action-7z@v1
+        with:
+          args: 7z a -t7z -mx=9 ${{ env.BUILD_VERSION }}.7z .\build\publish\x86\*
+
+      # 发布到Releases
+      - name: Publish to Releases 💸
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: ${{ env.GIT_BRANCH != 'release' }}
+          tag: ${{ env.BUILD_VERSION }}
+          artifacts: ${{ env.BUILD_PATH }}\publish\Clash.Mini*.7z
+#          bodyFile: .\CHANGELOG.md
+          bodyFile: .\RELEASELOG.md
+          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
