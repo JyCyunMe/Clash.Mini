@@ -174,7 +174,7 @@ jobs:
 
       # 准备压缩包
       - name: Compression x64 📦
-        if: success()
+        if: ${{ env.GIT_BRANCH == 'release' && success() }}
         shell: pwsh
         run: |
           7z a -t7z -mx=9 Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z .\build\publish\x64\*
