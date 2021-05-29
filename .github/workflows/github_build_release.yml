@@ -166,7 +166,7 @@ jobs:
       # 准备64位压缩包
       - name: Compression x64 📦
         if: success()
-        uses: actions/create-7z-action@v1
+        uses: DuckSoft/create-7z-action@v1
         with:
           pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z
           pathSource: .\build\publish\x64\*
@@ -174,7 +174,7 @@ jobs:
       # 准备32位压缩包
       - name: Compression x86 📦
         if: success()
-        uses: actions/create-7z-action@v1
+        uses: DuckSoft/create-7z-action@v1
         with:
           pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z
           pathSource: .\build\publish\x86\*
