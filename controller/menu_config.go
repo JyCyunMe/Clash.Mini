@@ -34,7 +34,7 @@ func StyleMenuRun(w *walk.MainWindow, SizeW int32, SizeH int32) {
 	hMenu = win.GetSystemMenu(w.Handle(), false)
 	win.RemoveMenu(hMenu, win.SC_CLOSE, win.MF_BYCOMMAND)
 	win.SetWindowPos(w.Handle(), 0, (xScreen-SizeW)/2, (yScreen-SizeH)/2, SizeW, SizeH, win.SWP_FRAMECHANGED)
-	win.ShowWindow(w.Handle(), win.SW_SHOW)
+	win.ShowWindow(w.Handle(), win.SW_SHOWNORMAL)
 	w.Run()
 }
 
@@ -204,8 +204,10 @@ func MenuConfig() {
 						AssignTo: &updateConfigs,
 						OnClicked: func() {
 							updateConfigs.SetText("更新中")
-							model.TaskCorn()
-							updateConfigs.SetText("更新完成")
+							go func(*walk.PushButton) {
+								model.TaskCorn()
+								updateConfigs.SetText("更新完成")
+							}(updateConfigs)
 						},
 					},
 					PushButton{

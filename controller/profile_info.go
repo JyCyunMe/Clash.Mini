@@ -148,7 +148,7 @@ func copyFileContents(src, dst, name string) (err error) {
 
 func putConfig(Name string) {
 	_, controllerPort := checkConfig()
-	err := copyFileContents("./Profile/"+Name+".yaml", "config.yaml", Name)
+	err := copyFileContents(fmt.Sprintf("./Profile/%s.yaml", Name), "config.yaml", Name)
 	time.Sleep(1 * time.Second)
 	if err != nil {
 		panic(err)

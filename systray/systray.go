@@ -6,7 +6,7 @@ import (
 	"github.com/Clash-Mini/Clash.Mini/cmd/sys"
 	"github.com/Clash-Mini/Clash.Mini/cmd/task"
 	"os"
-	"path/filepath"
+	path "path/filepath"
 	"runtime"
 	"time"
 
@@ -26,6 +26,14 @@ func init() {
 	if runtime.GOOS == "windows" {
 		currentDir, _ := os.Getwd()
 		C.SetHomeDir(currentDir)
+
+		if _, err := os.Stat("./Profile"); err != nil {
+			if os.IsNotExist(err) {
+				if err = os.Mkdir("./Profile", 0644); err != nil {
+					panic(err)
+				}
+			}
+		}
 	}
 	go func() {
 		runtime.LockOSThread()
@@ -265,9 +273,9 @@ func onReady() {
 				} else {
 					controller.TaskCommand(task.ON)
 					time.Sleep(2 * time.Second)
-					taskFile := filepath.Join(".", "task.xml")
+					taskFile := path.Join(".", "task.xml")
 					taskPath, _ := os.Getwd()
-					Filepath := filepath.Join(taskPath, taskFile)
+					Filepath := path.Join(taskPath, taskFile)
 					os.Remove(Filepath)
 					if controller.RegCompare(cmd.Task) {
 						notify.Notify("Startup")
