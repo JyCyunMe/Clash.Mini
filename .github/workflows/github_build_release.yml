@@ -76,7 +76,7 @@ jobs:
         run: |
           go version
           go env
-          mkdir -p .\build
+#          mkdir -p .\build
 
       # 运行Golang测试
       #  - name: Golang Test ✅
