@@ -172,7 +172,7 @@ jobs:
 
       # 准备压缩包
       - name: Compression x64 📦
-        if: success }}
+        if: success()
         shell: pwsh
         run: |
           7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z ${env:PUBLISH_PATH_X64}\*
