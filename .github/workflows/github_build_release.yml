@@ -111,7 +111,7 @@ jobs:
               $NOT_PASSED=1
               echo "A newer or the current version already exists."
           }
-          if ($NOT_PASSED -ge 0) {
+          if ($NOT_PASSED -ne 0) {
             echo "Check the version information is not passed."
             echo "This build has been aborted."
             exit 1
