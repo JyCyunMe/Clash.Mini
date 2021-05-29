@@ -156,7 +156,11 @@ jobs:
           echo "Ready to upload the following file(s):"
           ls .\publish
 
-          echo "Prepare to compression"
+      # 准备压缩
+      - name: Prepare to Compression 🕹
+        if: success()
+        shell: pwsh
+        run: |
           mkdir -p ($PUBLISH_PATH_X64="${env:BUILD_PATH}\publish\x64")
           mkdir -p ($PUBLISH_PATH_X86="${env:BUILD_PATH}\publish\x86")
           echo "PUBLISH_PATH_X64=$PUBLISH_PATH_X64" >> $env:GITHUB_ENV
@@ -170,7 +174,7 @@ jobs:
           $filesX86=$packageFiles
           foreach ($file in $filesX86) { cp .\$file $PUBLISH_PATH_X86\ }
 
-      # 准备压缩包
+      # 压缩打包
       - name: Compression x64 📦
         if: success()
         shell: pwsh
