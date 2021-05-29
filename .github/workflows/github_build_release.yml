@@ -82,10 +82,10 @@ jobs:
             $fileVersion=(echo $fileVersion | jq -r '.Major, .Minor, .Patch, .Build') -join '.'
             $tmpVer=[regex]::Match($fileVersion, $INTERNAL_VERSION_REGEXP)
             if (!$tmpVer.success) {
-              $NOT_PASSED=-1
+              $NOT_PASSED=1
             } else {
               $fileVersion=$tmpVer.Groups[1].Value
-              if ($tmpVer.Groups[2].Value -ne '.0') { $fileVersion+=$tmpVer.Groups[1].Value}
+              if ($tmpVer.Groups[2].Value -ne '.0') { $fileVersion+=$tmpVer.Groups[2].Value}
             }
 
             if ($NOT_PASSED -eq 0) {
@@ -93,10 +93,10 @@ jobs:
               $productVersion=(echo $productVersion | jq -r '.Major, .Minor, .Patch, .Build') -join '.'
               $tmpVer=[regex]::Match($productVersion, $INTERNAL_VERSION_REGEXP)
               if (!$tmpVer.success) {
-                $NOT_PASSED=-1
+                $NOT_PASSED=1
               } else {
                 $productVersion=$tmpVer.Groups[1].Value
-                if ($tmpVer.Groups[2].Value -ne '.0') { $productVersion+=$tmpVer.Groups[1].Value}
+                if ($tmpVer.Groups[2].Value -ne '.0') { $productVersion+=$tmpVer.Groups[2].Value}
               }
             }
           }
