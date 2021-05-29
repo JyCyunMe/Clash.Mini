@@ -87,6 +87,8 @@ jobs:
         if: success()
         shell: pwsh
         run: |
+          ls "C:/Program Files"
+          ls "C:/ProgramData/Chocolatey/bin"
           $env:GOOS="windows"
           $env:GOARCH="amd64"
           ls .\build
