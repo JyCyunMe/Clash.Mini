@@ -64,7 +64,7 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          echo "Build Version: ${env:BUILD_VERSION}`nLatest Tag: ${env:GIT_TAG_LATEST}`nThis Tag: ${env:GIT_TAG}"
+          echo "Build Version: ${env:BUILD_VERSION}`nLatest Tag: ${env:GIT_TAG_LATEST}`nThis Tag: ${env:GIT_TAG}`n"
           if ($env:GIT_TAG -eq '' -or ($env:GIT_TAG_LATEST -ne '' -and$env:GIT_TAG.replace('-pre', '') -lt $env:GIT_TAG_LATEST.replace('-pre', '') -or
             ($env:GIT_TAG.replace('-pre', '') -eq $env:GIT_TAG_LATEST.replace('-pre', '') -and($env:GIT_TAG.contains('-pre') -or !$env:GIT_TAG_LATEST.contains('-pre'))))) {
               echo "Check the version information is not passed."
