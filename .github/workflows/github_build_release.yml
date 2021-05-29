@@ -59,22 +59,19 @@ jobs:
           echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
           echo "Current Tag: $GIT_TAG"
 
-          if ($GIT_TAG -eq '' || $GIT_TAG_LATEST -eq '' || $GIT_TAG.replace('-pre') < $GIT_TAG_LATEST.replace('-pre') ||
-            ($GIT_TAG.replace('-pre') == $GIT_TAG_LATEST.replace('-pre') && ($GIT_TAG.contains('-pre') || !$GIT_TAG_LATEST.contains('-pre')))) {
-              $CHECK_FATAL=1
-              echo "Check the version information is not passed."
-              echo "CHECK_FATAL=$CHECK_FATAL" >> $env:GITHUB_ENV
-          }
-
       # 构建前检查
       - name: Check on Failures ❌
-        if: ${{ env.CHECK_FATAL }}
+        if: success()
         shell: pwsh
         run: |
-          echo "A newer or the current version already exists."
-          echo "Latest Tag: $env:GIT_TAG_LATEST, Build Version: $env:BUILD_VERSION"
-          echo "This build has been cancelled."
-          exit 1
+          if ($env:GIT_TAG -eq '' || $env:GIT_TAG_LATEST -eq '' || $env:GIT_TAG.replace('-pre') < $env:GIT_TAG_LATEST.replace('-pre') ||
+            ($env:GIT_TAG.replace('-pre') == $env:GIT_TAG_LATEST.replace('-pre') && ($env:GIT_TAG.contains('-pre') || !$env:GIT_TAG_LATEST.contains('-pre')))) {
+              echo "Check the version information is not passed."
+              echo "A newer or the current version already exists."
+              echo "Latest Tag: $env:GIT_TAG_LATEST, Build Version: $env:BUILD_VERSION"
+              echo "This build has been cancelled."
+              exit 1
+          }
 
       # 配置Golang环境
       - name: Setup Go Environment 📍
