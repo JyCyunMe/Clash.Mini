@@ -68,7 +68,7 @@ jobs:
 
       # 构建前检查
       - name: Check on Failures ❌
-        if: ${{ env.$CHECK_FATAL }}
+        if: ${{ env.CHECK_FATAL }}
         shell: pwsh
         run: |
           echo "A newer or the current version already exists."
