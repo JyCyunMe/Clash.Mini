@@ -37,7 +37,7 @@ jobs:
 
           $SHORT_SHA=${env:GITHUB_SHA}.Substring(0,7)
           echo "SHORT_SHA=$SHORT_SHA" >> $env:GITHUB_ENV
-          echo "Current commit hash id: ${env:GITHUB_SHA} ($SHORT_SHA)`n"
+          echo "Current commit hash id: ${env:GITHUB_SHA} ($SHORT_SHA)"
 
           $GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
           $GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
