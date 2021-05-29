@@ -87,8 +87,9 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          ls "C:/Program Files"
-          ls "C:/ProgramData/Chocolatey/bin"
+          ls "C:/Program Files/7-Zip"
+          7za
+          exit 1
           $env:GOOS="windows"
           $env:GOARCH="amd64"
           ls .\build
