@@ -166,16 +166,18 @@ jobs:
       # 准备64位压缩包
       - name: Compression x64 📦
         if: success()
-        uses: edgarrc/action-7z@v1
+        uses: actions/create-7z-action@v1
         with:
-          args: 7z a -t7z -mx=9 ${{ env.BUILD_VERSION }}.7z .\build\publish\x64\*
+          pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z
+          pathSource: .\build\publish\x64\*
 
       # 准备32位压缩包
       - name: Compression x86 📦
         if: success()
-        uses: edgarrc/action-7z@v1
+        uses: actions/create-7z-action@v1
         with:
-          args: 7z a -t7z -mx=9 ${{ env.BUILD_VERSION }}.7z .\build\publish\x86\*
+          pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z
+          pathSource: .\build\publish\x86\*
 
       # 发布到Releases
       - name: Publish to Releases 💸
