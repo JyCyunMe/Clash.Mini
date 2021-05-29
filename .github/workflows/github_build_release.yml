@@ -161,6 +161,7 @@ jobs:
         if: success()
         shell: pwsh
         run: |
+          cd $env:BUILD_PATH
           mkdir -p ($PUBLISH_PATH_X64="${env:BUILD_PATH}\publish\x64")
           mkdir -p ($PUBLISH_PATH_X86="${env:BUILD_PATH}\publish\x86")
           echo "PUBLISH_PATH_X64=$PUBLISH_PATH_X64" >> $env:GITHUB_ENV
