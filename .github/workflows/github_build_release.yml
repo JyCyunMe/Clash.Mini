@@ -61,7 +61,7 @@ jobs:
 
       # 构建前检查
       - name: Check on Failures ❌
-        if: ${{ env.GIT_TAG_LATEST != '' && env.GIT_TAG_LATEST >= env.BUILD_VERSION }}
+        if: ${{ env.GIT_TAG != '' && env.GIT_TAG >= env.BUILD_VERSION }}
         shell: pwsh
         run: |
           echo "A newer or the current version already exists."
