@@ -65,9 +65,9 @@ jobs:
       - name: Setup Go Environment 📍
         uses: actions/setup-go@v2
         if: success()
-#         with:
-#           go-version: ${{ env.go-version }}
-#           stable: ${{ env.go-stable }}
+        with:
+          go-version: ${{ env.go-version }}
+          stable: ${{ env.go-stable }}
 
       # 获取依赖包
       - name: Get Go Modules 📟
