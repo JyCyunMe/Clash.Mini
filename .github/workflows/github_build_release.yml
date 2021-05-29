@@ -154,10 +154,10 @@ jobs:
           mkdir -p .\publish\x64
           mkdir -p .\publish\x86
           $packageFiles@("Profile","config.yaml","Country.mmdb")
-          mv .\publish\Clash.Mini*64.exe .\publish\x64\Clash.Mini.exe
-          $filesX64=$packageFiles
+          mv .\build\publish\Clash.Mini*64.exe .\build\publish\x64\Clash.Mini.exe
+          $filesX64=$packageFiles + "publish\Clash.Mini*64.exe"
           foreach ($file in $filesX64){ cp .\$file .\build\publish\x64\ }
-          mv .\publish\Clash.Mini*86.exe .\publish\x86\Clash.Mini.exe
+          mv .\build\publish\Clash.Mini*86.exe .\build\publish\x86\Clash.Mini.exe
           $filesX86=$packageFiles + "publish\Clash.Mini*86.exe"
           foreach ($file in $filesX86){ cp .\$file .\build\publish\x86\ }
 
@@ -183,6 +183,6 @@ jobs:
           prerelease: ${{ env.GIT_BRANCH != 'release' }}
           tag: ${{ env.BUILD_VERSION }}
           artifacts: ${{ env.BUILD_PATH }}\publish\Clash.Mini*.7z
-#          bodyFile: .\CHANGELOG.md
+          #          bodyFile: .\CHANGELOG.md
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
