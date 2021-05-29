@@ -166,7 +166,7 @@ jobs:
           echo "PUBLISH_PATH_X64=$PUBLISH_PATH_X64" >> $env:GITHUB_ENV
           echo "PUBLISH_PATH_X86=$PUBLISH_PATH_X86" >> $env:GITHUB_ENV
           mkdir -p .\Profile
-          $packageFiles@("Profile", "config.yaml", "Country.mmdb")
+          $packageFiles=@("Profile", "config.yaml", "Country.mmdb")
           mv .\publish\Clash.Mini*64.exe $PUBLISH_PATH_X64\Clash.Mini.exe
           $filesX64=$packageFiles
           foreach ($file in $filesX64) { cp .\$file $PUBLISH_PATH_X64\ }
