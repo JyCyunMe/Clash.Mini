@@ -1,4 +1,4 @@
-name: Build Release
+name: Build Release Windows
 on:
   push:
     branches:
@@ -18,7 +18,7 @@ env:
 
 jobs:
   build-and-publish:
-    name: Build & Publish (Pre)Release
+    name: Build & Publish (Pre)Release Windows
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
     steps:
@@ -61,26 +61,11 @@ jobs:
           echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
           echo "Current Tag: $GIT_TAG"
 
-      # 构建前检查
-      - name: Check on Failures ❌
-        if: success()
-        shell: pwsh
-        run: |
-          echo "Build Version: ${env:BUILD_VERSION}`nCurrent Tag: ${env:GIT_TAG}`nLatest Tag: ${env:GIT_TAG_LATEST}`n"
-          if (!(${env:GIT_TAG} -match ${env:VERSION_REGEXP}) -or ${env:GIT_TAG} -eq '') {
-            $NOT_PASSED=1
-              echo "Cannot get the version information."
-          }
-          if ((${env:GIT_TAG_LATEST} -ne '' -and${env:GIT_TAG}.replace('-pre', '') -lt ${env:GIT_TAG_LATEST}.replace('-pre', '') -or
-            (${env:GIT_TAG}.replace('-pre', '') -eq ${env:GIT_TAG_LATEST}.replace('-pre', '') -and(${env:GIT_TAG}.contains('-pre') -or !${env:GIT_TAG_LATEST}.contains('-pre'))))) {
-              $NOT_PASSED=1
-              echo "A newer or the current version already exists."
-          }
-          if ($NOT_PASSED -ge 0) {
-            echo "Check the version information is not passed."
-            echo "This build has been cancelled."
-            exit 1
-          }
+      #      # 构建前检查
+      #      - name: Check on Failures ❌
+      #        if: success()
+      #        shell: pwsh
+      #        run: |
 
       # 配置Golang环境
       - name: Setup Go Environment 📍
@@ -110,7 +95,6 @@ jobs:
         run: |
           $env:GOOS="windows"
           $env:GOARCH="amd64"
-          ls .\build
           go build -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_x64.exe
 
       # 构建32位应用
