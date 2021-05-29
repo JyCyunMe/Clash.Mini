@@ -169,7 +169,7 @@ jobs:
         uses: DuckSoft/create-7z-action@v1.0
         with:
           pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z
-          pathSource: .\build\publish\x64\*
+          pathSource: .\\build\\publish\\x64\\*
 
       # 准备32位压缩包
       - name: Compression x86 📦
@@ -177,7 +177,7 @@ jobs:
         uses: DuckSoft/create-7z-action@v1.0
         with:
           pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z
-          pathSource: .\build\publish\x86\*
+          pathSource: .\\build\\publish\\x86\\*
 
       # 发布到Releases
       - name: Publish to Releases 💸
