@@ -38,9 +38,9 @@ jobs:
           echo "Current Branch: $GIT_BRANCH"
           echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } |
             sort -Descending -Top 1)
-          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } |
+          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?-pre$' } |
             sort -Descending -Top 1)
-          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo "$GIT_TAG_LATEST=$GIT_TAG_VERSION" }
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo ($GIT_TAG_LATEST=$GIT_TAG_VERSION) }
             else { echo ($GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -Descending -Top 1) }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
@@ -59,9 +59,16 @@ jobs:
           echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
           echo "Current Tag: $GIT_TAG"
 
+          if ($GIT_TAG -eq '' || $GIT_TAG_LATEST -eq '' || $GIT_TAG.replace('-pre') < $GIT_TAG_LATEST.replace('-pre') ||
+            ($GIT_TAG.replace('-pre') == $GIT_TAG_LATEST.replace('-pre') && ($GIT_TAG.contains('-pre') || !$GIT_TAG_LATEST.contains('-pre')))) {
+              $CHECK_FATAL=1
+              echo "Check the version information is not passed."
+              echo "CHECK_FATAL=$CHECK_FATAL" >> $env:GITHUB_ENV
+          }
+
       # 构建前检查
       - name: Check on Failures ❌
-        if: ${{ env.GIT_TAG_LATEST != '' && env.GIT_TAG_LATEST>= env.GIT_TAG }}
+        if: ${{ env.$CHECK_FATAL }}
         shell: pwsh
         run: |
           echo "A newer or the current version already exists."
