@@ -89,7 +89,9 @@ jobs:
         run: |
           $env:GOOS="windows"
           $env:GOARCH="amd64"
-          go build -a -v -x -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_release_x64.exe
+          ls .\build
+          go build -ldflags "-H=windowsgui -s -w" -o .\Clash.Mini_release_x64.exe
+          go build -ldflags "-H=windowsgui -s -w" -o .\build\Clash.Mini_release_x64.exe
 
       # 构建32位应用
       - name: Build x86 Application 🛠
