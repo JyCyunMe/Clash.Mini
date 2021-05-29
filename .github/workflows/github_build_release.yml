@@ -36,7 +36,9 @@ jobs:
           $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
           echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
           echo "Current Branch: $GIT_BRANCH"
-          $GIT_TAG_LATEST=git tag -l 'v*.*.*' | Sort-Object -Descending -Top 1
+          echo "$GIT_TAG_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } | sort -Descending -Top 1"
+          echo "$GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } | sort -Descending -Top 1"
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo "$GIT_TAG_LATEST=$GIT_TAG_VERSION" } else { echo "$GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -Descending -Top 1" }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
 
@@ -50,6 +52,9 @@ jobs:
           $BUILD_VERSION=cat .\versioninfo.json | jq -r '.StringFileInfo.ProductVersion'
           echo "BUILD_VERSION=$BUILD_VERSION" >> $env:GITHUB_ENV
           echo "Build Version: $BUILD_VERSION"
+          $GIT_TAG="$BUILD_VERSION$(${env:GIT_BRANCH} -ne 'release' ? '-pre' : '')"
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
+          echo "Current Tag: GIT_BRANCH"
 
       # 构建前检查
       - name: Check on Failures ❌
@@ -166,21 +171,13 @@ jobs:
           $filesX86=$packageFiles + "publish\Clash.Mini*86.exe"
           foreach ($file in $filesX86){ cp .\$file .\build\publish\x86\ }
 
-      # 准备64位压缩包
+      # 准备压缩包
       - name: Compression x64 📦
         if: success()
-        uses: DuckSoft/create-7z-action@v1.0
-        with:
-          pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z
-          pathSource: .\\build\\publish\\x64\\*
-
-      # 准备32位压缩包
-      - name: Compression x86 📦
-        if: success()
-        uses: DuckSoft/create-7z-action@v1.0
-        with:
-          pathTarget: Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z
-          pathSource: .\\build\\publish\\x86\\*
+        shell: pwsh
+        run: |
+          7z a -t7z -mx=9 Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z .\build\publish\x64\*
+          7z a -t7z -mx=9 Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z .\build\publish\x86\*
 
       # 发布到Releases
       - name: Publish to Releases 💸
