@@ -39,13 +39,10 @@ jobs:
           echo "SHORT_SHA=$SHORT_SHA" >> $env:GITHUB_ENV
           echo "Current commit hash id: ${env:GITHUB_SHA} ($SHORT_SHA)`n"
 
-          echo "List tags:"
-          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
-            sort -descending -top 1)
-          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
-            sort -descending -top 1)
-          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo ($GIT_TAG_LATEST=$GIT_TAG_VERSION) }
-            else { echo ($GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1) }
+          $GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
+          $GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } | sort -descending -top 1
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { $GIT_TAG_LATEST=$GIT_TAG_VERSION }
+            else { $GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1 }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
 
