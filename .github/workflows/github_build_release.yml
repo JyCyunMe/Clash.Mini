@@ -125,9 +125,6 @@ jobs:
           echo "Ready to upload the following file(s):"
           ls .\publish
 
-          $RELEASE_ARTIFACTS=${env:BUILD_PATH}\publish\Clash.Mini_*.exe
-          echo "RELEASE_ARTIFACTS=$RELEASE_ARTIFACTS" >> $env:GITHUB_ENV
-
       # 上传64位应用到Actions Artifacts
       - name: Upload x64 Application to Artifacts 📤
         if: ${{ steps.prepare-pre-release.outcome == 'success' }}
@@ -164,6 +161,7 @@ jobs:
           mkdir -p ($PUBLISH_PATH_X86="${env:BUILD_PATH}\publish\x86")
           echo "PUBLISH_PATH_X64=$PUBLISH_PATH_X64" >> $env:GITHUB_ENV
           echo "PUBLISH_PATH_X86=$PUBLISH_PATH_X86" >> $env:GITHUB_ENV
+          mkdir -p .\Profile
           $packageFiles@("Profile", "config.yaml", "Country.mmdb")
           mv .\publish\Clash.Mini*64.exe $PUBLISH_PATH_X64\Clash.Mini.exe
           $filesX64=$packageFiles
@@ -172,12 +170,9 @@ jobs:
           $filesX86=$packageFiles
           foreach ($file in $filesX86) { cp .\$file $PUBLISH_PATH_X86\ }
 
-          $RELEASE_ARTIFACTS=${env:BUILD_PATH}\publish\Clash.Mini*.7z
-          echo "RELEASE_ARTIFACTS=$RELEASE_ARTIFACTS" >> $env:GITHUB_ENV
-
       # 准备压缩包
       - name: Compression x64 📦
-        if: ${{ env.GIT_BRANCH == 'release' && success() }}
+        if: success }}
         shell: pwsh
         run: |
           7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z ${env:PUBLISH_PATH_X64}\*
@@ -189,8 +184,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ env.GIT_BRANCH != 'release' }}
-          tag: ${{ env.BUILD_VERSION }}
-          artifacts: ${{ env.RELEASE_ARTIFACTS }}
+          tag: ${{ env.GIT_TAG }}
+          artifacts: ${{ env.BUILD_PATH }}\publish\Clash.Mini*.7z
           #          bodyFile: .\CHANGELOG.md
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
