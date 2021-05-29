@@ -36,9 +36,12 @@ jobs:
           $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
           echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
           echo "Current Branch: $GIT_BRANCH"
-          echo "$GIT_TAG_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } | sort -Descending -Top 1"
-          echo "$GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } | sort -Descending -Top 1"
-          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo "$GIT_TAG_LATEST=$GIT_TAG_VERSION" } else { echo "$GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -Descending -Top 1" }
+          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } |
+            sort -Descending -Top 1)
+          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } |
+            sort -Descending -Top 1)
+          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo "$GIT_TAG_LATEST=$GIT_TAG_VERSION" }
+            else { echo "$GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -Descending -Top 1" }
           echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
           echo "Latest Tag: $GIT_TAG_LATEST"
 
@@ -92,9 +95,6 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          ls "C:/Program Files/7-Zip"
-          7za
-          exit 1
           $env:GOOS="windows"
           $env:GOARCH="amd64"
           ls .\build
@@ -159,7 +159,8 @@ jobs:
           echo "BUILD_X86_FILENAME=$BUILD_X86_FILENAME" >> $env:GITHUB_ENV
           cp .\Clash.Mini_release_*.exe .\publish\
           echo "Ready to upload the following file(s):"
-          ls .\publish -Include 'Clash.Mini_release_*.exe' -Recurse | ForEach-Object { Rename-Item $_.FullName $_.FullName.Replace('_release', '') }
+          ls .\publish -Include 'Clash.Mini_release_*.exe' -Recurse |
+            ForEach-Object { Rename-Item $_.FullName $_.FullName.Replace('_release', '') }
           echo "Prepare to compression"
           mkdir -p .\publish\x64
           mkdir -p .\publish\x86
