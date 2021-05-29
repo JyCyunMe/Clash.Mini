@@ -76,7 +76,7 @@ jobs:
         run: |
           go version
           go env
-#          mkdir -p .\build
+          mkdir -p .\build
 
       # 运行Golang测试
       #  - name: Golang Test ✅
@@ -154,8 +154,10 @@ jobs:
           mkdir -p .\publish\x64
           mkdir -p .\publish\x86
           $packageFiles@("Profile","config.yaml","Country.mmdb")
-          $filesX64=$packageFiles + "publish\Clash.Mini*64.exe"
+          mv .\publish\Clash.Mini*64.exe .\publish\x64\Clash.Mini.exe
+          $filesX64=$packageFiles
           foreach ($file in $filesX64){ cp .\$file .\build\publish\x64\ }
+          mv .\publish\Clash.Mini*86.exe .\publish\x86\Clash.Mini.exe
           $filesX86=$packageFiles + "publish\Clash.Mini*86.exe"
           foreach ($file in $filesX86){ cp .\$file .\build\publish\x86\ }
 
