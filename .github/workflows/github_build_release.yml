@@ -64,11 +64,11 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          if ($env:GIT_TAG -eq '' || $env:GIT_TAG_LATEST -eq '' || $env:GIT_TAG.replace('-pre') -lt $env:GIT_TAG_LATEST.replace('-pre') ||
-            ($env:GIT_TAG.replace('-pre') -eq $env:GIT_TAG_LATEST.replace('-pre') && ($env:GIT_TAG.contains('-pre') || !$env:GIT_TAG_LATEST.contains('-pre')))) {
+          echo "Latest Tag: $env:GIT_TAG_LATEST`nThis Tag: $env:GIT_TAG`nBuild Version: $env:BUILD_VERSION"
+          if ($env:GIT_TAG -eq '' -or ($env:GIT_TAG_LATEST -ne '' -and$env:GIT_TAG.replace('-pre', '') -lt $env:GIT_TAG_LATEST.replace('-pre', '') -or
+            ($env:GIT_TAG.replace('-pre', '') -eq $env:GIT_TAG_LATEST.replace('-pre', '') -and($env:GIT_TAG.contains('-pre') -or !$env:GIT_TAG_LATEST.contains('-pre'))))) {
               echo "Check the version information is not passed."
               echo "A newer or the current version already exists."
-              echo "Latest Tag: $env:GIT_TAG_LATEST, Build Version: $env:BUILD_VERSION"
               echo "This build has been cancelled."
               exit 1
           }
@@ -184,8 +184,8 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.BUILD_VERSION }}.x64.7z ${env:PUBLISH_PATH_X64}\*
-          7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.BUILD_VERSION }}.x86.7z ${env:PUBLISH_PATH_X86}\*
+          7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.GIT_TAG }}.x64.7z ${env:PUBLISH_PATH_X64}\*
+          7z a -t7z -mx=9 ${env:BUILD_PATH}\publish\Clash.Mini.${{ env.GIT_TAG }}.x86.7z ${env:PUBLISH_PATH_X86}\*
 
       # 发布到Releases
       - name: Publish to Releases 💸
