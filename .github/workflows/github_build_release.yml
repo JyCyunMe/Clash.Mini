@@ -33,12 +33,14 @@ jobs:
       - name: Get Git Info 💡
         shell: pwsh
         run: |
+          $VERSION_REGEXP='^v?\d+\.\d+\.\d+(\.\d+)?-pre$'
+          echo "VERSION_REGEXP=$VERSION_REGEXP" >> $env:GITHUB_ENV
           $GIT_BRANCH=$env:GITHUB_REF -replace 'refs/heads/', ''
           echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
           echo "Current Branch: $GIT_BRANCH"
-          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?$' } |
+          echo ($GIT_TAG_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
             sort -descending -top 1)
-          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match '^v?\d+\.\d+\.\d+(\.\d+)?-pre$' } |
+          echo ($GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_REGEXP } |
             sort -descending -top 1)
           if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_VERSION + '-pre') { echo ($GIT_TAG_LATEST=$GIT_TAG_VERSION) }
             else { echo ($GIT_TAG_LATEST=@($GIT_TAG_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1) }
@@ -64,13 +66,20 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          echo "Build Version: ${env:BUILD_VERSION}`nLatest Tag: ${env:GIT_TAG_LATEST}`nThis Tag: ${env:GIT_TAG}`n"
-          if ($env:GIT_TAG -eq '' -or ($env:GIT_TAG_LATEST -ne '' -and$env:GIT_TAG.replace('-pre', '') -lt $env:GIT_TAG_LATEST.replace('-pre', '') -or
-            ($env:GIT_TAG.replace('-pre', '') -eq $env:GIT_TAG_LATEST.replace('-pre', '') -and($env:GIT_TAG.contains('-pre') -or !$env:GIT_TAG_LATEST.contains('-pre'))))) {
-              echo "Check the version information is not passed."
+          echo "Build Version: ${env:BUILD_VERSION}`nCurrent Tag: ${env:GIT_TAG}`nLatest Tag: ${env:GIT_TAG_LATEST}`n"
+          if (!(${env:GIT_TAG} -match ${env:VERSION_REGEXP}) -or ${env:GIT_TAG} -eq '') {
+            $NOT_PASSED=1
+              echo "Cannot get the version information."
+          }
+          if ((${env:GIT_TAG_LATEST} -ne '' -and${env:GIT_TAG}.replace('-pre', '') -lt ${env:GIT_TAG_LATEST}.replace('-pre', '') -or
+            (${env:GIT_TAG}.replace('-pre', '') -eq ${env:GIT_TAG_LATEST}.replace('-pre', '') -and(${env:GIT_TAG}.contains('-pre') -or !${env:GIT_TAG_LATEST}.contains('-pre'))))) {
+              $NOT_PASSED=1
               echo "A newer or the current version already exists."
-              echo "This build has been cancelled."
-              exit 1
+          }
+          if ($NOT_PASSED -ge 0) {
+            echo "Check the version information is not passed."
+            echo "This build has been cancelled."
+            exit 1
           }
 
       # 配置Golang环境
