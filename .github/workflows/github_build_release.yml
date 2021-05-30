@@ -240,7 +240,11 @@ jobs:
         shell: pwsh
         run: |
           curl 'https://github.com/jycyunme.gpg' | gpg --import
-          git verify-tag ${env:GIT_TAG} || exit 1
+          if (!(git verify-tag ${env:GIT_TAG})) {
+            echo "Tag ""${env:GIT_TAG}"" verify failed"
+            exit 1
+          }
+          echo "Tag ""${env:GIT_TAG}"" has been verified"
 
       # 发布到Releases
       - name: Publish to Releases 💸
