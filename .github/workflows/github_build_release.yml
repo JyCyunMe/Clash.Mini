@@ -20,7 +20,7 @@ jobs:
   build-and-publish:
     name: Build & Publish (Pre)Release Windows
     runs-on: windows-latest
-    if: ${{ !contains(github.event.head_commit.message, "[Skip CI]") }}
+    if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
