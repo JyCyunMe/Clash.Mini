@@ -241,6 +241,7 @@ jobs:
         run: |
           7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
           7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
+          ls $env:RELEASE_PATH
 
       # 生成Release Hash
       - name: Hash Releases ⌨
@@ -249,6 +250,7 @@ jobs:
         run: |
           echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > ${env:RELEASE_PKG_X64}.sha256
           echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > ${env:RELEASE_PKG_X86}.sha256
+          ls $env:RELEASE_PATH
 
       # 发布到Releases
       - name: Publish to Releases 💸
