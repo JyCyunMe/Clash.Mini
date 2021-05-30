@@ -123,6 +123,24 @@ jobs:
             echo "This build has been aborted."
             exit 1
           }
+
+      # 配置Golang环境
+      - name: Setup Go Environment 📍
+        uses: actions/setup-go@v2
+        if: success()
+        with:
+          go-version: ${{ env.go-version }}
+          stable: ${{ env.go-stable }}
+
+      # 获取依赖包
+      - name: Get Go Modules 📟
+        if: success()
+        shell: pwsh
+        run: |
+          go version
+          go env
+          go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+          go generate -x -v .\main.go
           mkdir -p ${env:BUILD_PATH}
 
       # 运行Golang测试
