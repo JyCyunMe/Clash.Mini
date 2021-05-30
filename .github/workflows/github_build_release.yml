@@ -243,7 +243,7 @@ jobs:
 
           git verify-tag $GIT_TAG --raw 2>actual &&
           grep "GOODSIG" actual &&
-          !grep "BADSIG" actual &&
+          ! grep "BADSIG" actual &&
           echo "Tag \"$GIT_TAG\" has been verified" || echo "Tag \"$GIT_TAG\" verify failed" & exit 1
 
       # 发布到Releases
