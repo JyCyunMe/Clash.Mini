@@ -264,3 +264,10 @@ jobs:
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
+      # 验证Release
+      - name: Verify Release ⌨
+        if: success()
+        shell: pwsh
+        run: |
+          curl 'https://github.com/jycyunme.gpg' | gpg --import
+          git verify-tag ${env:GIT_TAG} || exit 1
