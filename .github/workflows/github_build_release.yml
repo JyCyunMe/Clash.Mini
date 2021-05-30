@@ -76,7 +76,7 @@ jobs:
           echo "Build Version: v${env:BUILD_VERSION}`nCurrent Tag: ${env:GIT_TAG}`nLatest Tag: ${env:GIT_TAG_LATEST}`n"
           if (!(${env:GIT_TAG} -match ${env:VERSION_REGEXP}) -or ${env:GIT_TAG} -eq "") {
             $NOT_PASSED=1
-            echo "Cannot get the version information or it"s incorrect."
+            echo "Cannot get the version information or it's incorrect."
           }
 
           if ($NOT_PASSED -eq 0) {
