@@ -263,9 +263,9 @@ jobs:
         run: |
           curl 'https://github.com/jycyunme.gpg' | gpg --import
 
-          git verify-tag $GIT_TAG --raw 2>actual &&
+          (git verify-tag $GIT_TAG --raw 2>actual &&
           grep "GOODSIG" actual && ! grep "BADSIG" actual &&
-          echo "Tag \"$GIT_TAG\" has been verified" || (echo "Tag \"$GIT_TAG\" verify failed" & exit 1)
+          echo "Tag \"$GIT_TAG\" has been verified") || echo "Tag \"$GIT_TAG\" verify failed" && exit 1
 
       # 发布到Releases
       - name: Publish to Releases 💸
