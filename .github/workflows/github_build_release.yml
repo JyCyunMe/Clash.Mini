@@ -166,7 +166,7 @@ jobs:
       # 准备发布PreRelease文件
       - id: prepare-pre-release
         name: Prepare to Publish PreRelease 🕹
-        if: ${{ env.GIT_BRANCH != "release" && success() }}
+        if: ${{ env.GIT_BRANCH != 'release' && success() }}
         shell: pwsh
         run: |
           cd $env:BUILD_PATH
@@ -181,7 +181,7 @@ jobs:
 
       # 上传64位应用到Actions Artifacts
       - name: Upload x64 Application to Artifacts 📤
-        if: ${{ steps.prepare-pre-release.outcome == "success" }}
+        if: ${{ steps.prepare-pre-release.outcome == 'success' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.BUILD_X64_FILENAME }}
@@ -191,7 +191,7 @@ jobs:
 
       # 上传32位应用到Actions Artifacts
       - name: Upload x86 Application to Artifacts 📤
-        if: ${{ steps.prepare-pre-release.outcome == "success" && success() }}
+        if: ${{ steps.prepare-pre-release.outcome == 'success' && success() }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ env.BUILD_X86_FILENAME }}
@@ -257,7 +257,7 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1
         with:
-          prerelease: ${{ env.GIT_BRANCH != "release" }}
+          prerelease: ${{ env.GIT_BRANCH != 'release' }}
           tag: ${{ env.GIT_TAG }}
           artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
           #          bodyFile: .\CHANGELOG.md
