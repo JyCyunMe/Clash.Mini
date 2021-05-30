@@ -248,8 +248,8 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > ${env:RELEASE_PKG_X64}.sha256
-          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > ${env:RELEASE_PKG_X86}.sha256
+          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
+          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
           ls $env:RELEASE_PATH
 
       # 发布到Releases
