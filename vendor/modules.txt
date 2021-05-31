@@ -95,6 +95,8 @@ github.com/go-toast/toast
 github.com/gofrs/uuid
 # github.com/gorilla/websocket v1.4.2
 github.com/gorilla/websocket
+# github.com/josephspurrier/goversioninfo v1.2.0
+## explicit
 # github.com/kr/pretty v0.1.0
 ## explicit
 # github.com/lxn/walk v0.0.0-20210112085537-c389da54e794

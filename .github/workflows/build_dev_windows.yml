@@ -89,7 +89,9 @@ jobs:
           go version
           go env
           go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo
+          ls vendor/github.com/Dreamacro/clash/config/config.go
           go mod vendor
+          ls vendor/github.com/Dreamacro/clash/config/config.go
           go generate -x -v .\main.go
           mkdir -p ${env:BUILD_PATH}
 
