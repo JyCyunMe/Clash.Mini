@@ -264,7 +264,7 @@ jobs:
         with:
           prerelease: ${{ env.GIT_BRANCH != 'release' }}
           tag: ${{ env.GIT_TAG }}
-          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
+          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*.7z
           #          bodyFile: .\CHANGELOG.md
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
