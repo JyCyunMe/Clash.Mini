@@ -1,0 +1,180 @@
+# github.com/Dreamacro/clash v1.6.0
+## explicit
+github.com/Dreamacro/clash/adapters/inbound
+github.com/Dreamacro/clash/adapters/outbound
+github.com/Dreamacro/clash/adapters/outboundgroup
+github.com/Dreamacro/clash/adapters/provider
+github.com/Dreamacro/clash/common/cache
+github.com/Dreamacro/clash/common/murmur3
+github.com/Dreamacro/clash/common/net
+github.com/Dreamacro/clash/common/observable
+github.com/Dreamacro/clash/common/picker
+github.com/Dreamacro/clash/common/pool
+github.com/Dreamacro/clash/common/queue
+github.com/Dreamacro/clash/common/singledo
+github.com/Dreamacro/clash/common/sockopt
+github.com/Dreamacro/clash/common/structure
+github.com/Dreamacro/clash/component/auth
+github.com/Dreamacro/clash/component/dialer
+github.com/Dreamacro/clash/component/fakeip
+github.com/Dreamacro/clash/component/gun
+github.com/Dreamacro/clash/component/mmdb
+github.com/Dreamacro/clash/component/nat
+github.com/Dreamacro/clash/component/pool
+github.com/Dreamacro/clash/component/process
+github.com/Dreamacro/clash/component/profile
+github.com/Dreamacro/clash/component/profile/cachefile
+github.com/Dreamacro/clash/component/resolver
+github.com/Dreamacro/clash/component/simple-obfs
+github.com/Dreamacro/clash/component/snell
+github.com/Dreamacro/clash/component/socks5
+github.com/Dreamacro/clash/component/ssr/obfs
+github.com/Dreamacro/clash/component/ssr/protocol
+github.com/Dreamacro/clash/component/ssr/tools
+github.com/Dreamacro/clash/component/trie
+github.com/Dreamacro/clash/component/trojan
+github.com/Dreamacro/clash/component/v2ray-plugin
+github.com/Dreamacro/clash/component/vmess
+github.com/Dreamacro/clash/config
+github.com/Dreamacro/clash/constant
+github.com/Dreamacro/clash/context
+github.com/Dreamacro/clash/dns
+github.com/Dreamacro/clash/hub
+github.com/Dreamacro/clash/hub/executor
+github.com/Dreamacro/clash/hub/route
+github.com/Dreamacro/clash/log
+github.com/Dreamacro/clash/proxy
+github.com/Dreamacro/clash/proxy/auth
+github.com/Dreamacro/clash/proxy/http
+github.com/Dreamacro/clash/proxy/mixed
+github.com/Dreamacro/clash/proxy/redir
+github.com/Dreamacro/clash/proxy/socks
+github.com/Dreamacro/clash/rules
+github.com/Dreamacro/clash/tunnel
+github.com/Dreamacro/clash/tunnel/statistic
+# github.com/Dreamacro/go-shadowsocks2 v0.1.7
+github.com/Dreamacro/go-shadowsocks2/core
+github.com/Dreamacro/go-shadowsocks2/shadowaead
+github.com/Dreamacro/go-shadowsocks2/shadowstream
+# github.com/beevik/etree v1.1.0
+## explicit
+github.com/beevik/etree
+# github.com/elazarl/go-bindata-assetfs v1.0.0
+## explicit
+github.com/elazarl/go-bindata-assetfs
+# github.com/getlantern/context v0.0.0-20190109183933-c447772a6520
+github.com/getlantern/context
+# github.com/getlantern/errors v1.0.1
+github.com/getlantern/errors
+# github.com/getlantern/golog v0.0.0-20201105130739-9586b8bde3a9
+## explicit
+github.com/getlantern/golog
+# github.com/getlantern/hex v0.0.0-20190417191902-c6586a6fe0b7
+github.com/getlantern/hex
+# github.com/getlantern/hidden v0.0.0-20201229170000-e66e7f878730
+## explicit
+github.com/getlantern/hidden
+# github.com/getlantern/ops v0.0.0-20200403153110-8476b16edcd6
+## explicit
+github.com/getlantern/ops
+# github.com/getlantern/systray v1.1.0
+## explicit
+github.com/getlantern/systray
+# github.com/go-chi/chi/v5 v5.0.3
+github.com/go-chi/chi/v5
+# github.com/go-chi/cors v1.2.0
+github.com/go-chi/cors
+# github.com/go-chi/render v1.0.1
+github.com/go-chi/render
+# github.com/go-stack/stack v1.8.0
+github.com/go-stack/stack
+# github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4
+## explicit
+github.com/go-toast/toast
+# github.com/gofrs/uuid v4.0.0+incompatible
+github.com/gofrs/uuid
+# github.com/gorilla/websocket v1.4.2
+github.com/gorilla/websocket
+# github.com/kr/pretty v0.1.0
+## explicit
+# github.com/lxn/walk v0.0.0-20210112085537-c389da54e794
+## explicit
+github.com/lxn/walk
+github.com/lxn/walk/declarative
+# github.com/lxn/win v0.0.0-20210218163916-a377121e959e
+## explicit
+github.com/lxn/win
+# github.com/miekg/dns v1.1.42
+github.com/miekg/dns
+# github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
+## explicit
+github.com/nu7hatch/gouuid
+# github.com/oschwald/geoip2-golang v1.5.0
+github.com/oschwald/geoip2-golang
+# github.com/oschwald/maxminddb-golang v1.8.0
+github.com/oschwald/maxminddb-golang
+# github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
+github.com/oxtoacart/bpool
+# github.com/robfig/cron/v3 v3.0.1
+## explicit
+github.com/robfig/cron/v3
+# github.com/sirupsen/logrus v1.8.1
+github.com/sirupsen/logrus
+# github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
+## explicit
+github.com/skratchdot/open-golang/open
+# github.com/zserge/lorca v0.1.10
+## explicit
+github.com/zserge/lorca
+# go.uber.org/atomic v1.7.0
+go.uber.org/atomic
+# golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+## explicit
+golang.org/x/crypto/argon2
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/chacha20
+golang.org/x/crypto/chacha20poly1305
+golang.org/x/crypto/hkdf
+golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/poly1305
+# golang.org/x/net v0.0.0-20210510120150-4163338589ed
+## explicit
+golang.org/x/net/bpf
+golang.org/x/net/http/httpguts
+golang.org/x/net/http2
+golang.org/x/net/http2/hpack
+golang.org/x/net/idna
+golang.org/x/net/internal/iana
+golang.org/x/net/internal/socket
+golang.org/x/net/ipv4
+golang.org/x/net/ipv6
+golang.org/x/net/publicsuffix
+golang.org/x/net/websocket
+# golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+golang.org/x/sync/singleflight
+# golang.org/x/sys v0.0.0-20210514084401-e8d321eab015
+## explicit
+golang.org/x/sys/cpu
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+golang.org/x/sys/windows/registry
+# golang.org/x/text v0.3.6
+## explicit
+golang.org/x/text/encoding
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/unicode
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/secure/bidirule
+golang.org/x/text/transform
+golang.org/x/text/unicode/bidi
+golang.org/x/text/unicode/norm
+# gopkg.in/Knetic/govaluate.v3 v3.0.0
+## explicit
+gopkg.in/Knetic/govaluate.v3
+# gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127
+## explicit
+# gopkg.in/yaml.v2 v2.4.0
+gopkg.in/yaml.v2
