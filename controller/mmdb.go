@@ -6,23 +6,21 @@ import (
 	"os"
 	path "path/filepath"
 
-	"github.com/lxn/walk"
-
-	"github.com/Clash-Mini/Clash.Mini/cmd"
 	"github.com/Clash-Mini/Clash.Mini/cmd/mmdb"
+
+	"github.com/lxn/walk"
 )
 
-func GetMMDB(arg string) {
+func GetMMDB(value mmdb.Type) {
 	var url string
-	var value mmdb.Type
 	client := &http.Client{}
-	switch arg {
-	case "Max":
+	switch value {
+	case mmdb.Max:
 		url = "https://cdn.jsdelivr.net/gh/Dreamacro/maxmind-geoip@release/Country.mmdb"
-		value = mmdb.Max
-	case "Lite":
+		break
+	case mmdb.Lite:
 		url = "https://cdn.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/Country.mmdb"
-		value = mmdb.Lite
+		break
 	}
 	res, _ := http.NewRequest(http.MethodGet, url, nil)
 	resp, err := client.Do(res)
@@ -37,5 +35,5 @@ func GetMMDB(arg string) {
 		panic(err)
 	}
 	io.Copy(f, resp.Body)
-	RegCmd(cmd.MMDB, value)
+	RegCmd(value)
 }
