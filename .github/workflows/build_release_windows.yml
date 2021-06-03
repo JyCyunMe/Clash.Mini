@@ -234,4 +234,5 @@ jobs:
       - name: Send to TG💡
         shell: bash
         run: |
+          docker pull appleboy/drone-telegram
           docker run --rm -e PLUGIN_TOKEN="${{ secrets.TG_TOKEN }}" -e PLUGIN_TO=JyCyun -e PLUGIN_MESSAGE="test release \n see full in https://jycyun.me" -e PLUGIN_DOCUMENT="${{ env.RELEASE_PATH }}\Clash.Mini*" -e PLUGIN_DISABLE_WEB_PAGE_PREVIEW=true -v "$(pwd)":"$(pwd)" -w "$(pwd)" appleboy/drone-telegram
