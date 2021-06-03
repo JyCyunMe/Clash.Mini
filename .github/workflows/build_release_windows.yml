@@ -34,6 +34,8 @@ jobs:
       - name: Get Git Info 💡
         shell: pwsh
         run: |
+          echo "WORKDIR=$pwd" >> $env:GITHUB_ENV
+          $GIT_BRANCH=$env:GITHUB_REF -replace "refs/heads/", ""
           $VERSION_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?(-pre)?$"
           $VERSION_RELEASE_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?$"
           $VERSION_PRE_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?-pre$"
@@ -201,7 +203,7 @@ jobs:
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
           
-          $str = $(cat ${env;GITHUB_WORKSPACE}\RELEASELOG.MD)
+          $str = $(cat ${env:WORKDIR}\RELEASELOG.MD)
           $ustr = ""
           for($i = 0; $i -lt $str.Length; $i++){
             if([int]$str[$i] -gt 32 -and [int]$str[$i] -lt 127){
@@ -210,8 +212,8 @@ jobs:
               $ustr += [System.String]::Format("\u{0:x4}", [int]$str[$i])
             }
           }
-          ls ${env:GITHUB_WORKSPACE}
-          echo $ustr > ${env:GITHUB_WORKSPACE}\post.txt
+          ls ${env:WORKDIR}
+          echo $ustr > ${env:WORKDIR}\post.txt
       #
       #      # 压缩打包
       #      - name: Compression x64 📦
