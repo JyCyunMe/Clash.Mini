@@ -230,9 +230,36 @@ jobs:
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
-      # 发送到TG群
-      - name: Send to TG💡
-        shell: bash
-        run: |
-          docker pull appleboy/drone-telegram
-          docker run --rm -e PLUGIN_TOKEN="${{ secrets.TG_TOKEN }}" -e PLUGIN_TO=JyCyun -e PLUGIN_MESSAGE="test release \n see full in https://jycyun.me" -e PLUGIN_DOCUMENT="${{ env.RELEASE_PATH }}\Clash.Mini*" -e PLUGIN_DISABLE_WEB_PAGE_PREVIEW=true -v "$(pwd)":"$(pwd)" -w "$(pwd)" appleboy/drone-telegram
+      # 缓存Build文件
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-build-release
+        with:
+          path: ${{ env.PUBLISH_PATH }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+  notifaction:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: build-release-windows
+    steps:
+      - name: Download Release 📦
+        uses: Legion2/download-release-action@v2.1.0
+        with:
+          repository: JyCyunMe/Clash.Mini
+          tag: ${{ env.GIT_TAG }}
+          path: ./release
+
+      - name: Send to TG 💡
+        uses: appleboy/telegram-action@master
+        with:
+          to: JyCyun
+          token: ${{ secrets.TG_TOKEN }}
+          message: "test release \nSee full in https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"
+          disable_web_page_preview: true
+          document: ./release/Clash.Mini*
