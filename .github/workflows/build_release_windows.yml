@@ -270,11 +270,8 @@ jobs:
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
       # 发送到TG群
-      - name: Telegram Message Notify
-        uses: appleboy/telegram-action@v0.1.1
-        with:
-          to: ClashMin1
-          token: ${{ secrets.TG_TOKEN }}
-          message: send photo message
-          message_file: ${{ env.RELEASE_PATH }}\Clash.Mini*
-          disable_web_page_preview: true
+      - name: Send to TG💡
+        shell: pwsh
+        run: |
+          go get -u -v github.com/appleboy/drone-telegram
+          drone-telegram --to JyCyun --token ${{ secrets.TG_TOKEN }} --message "test release \n see full in https://jycyun.me" --document ${{ env.RELEASE_PATH }}\Clash.Mini* --disable_web_page_preview true
