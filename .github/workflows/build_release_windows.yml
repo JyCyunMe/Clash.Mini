@@ -200,36 +200,36 @@ jobs:
           $RELEASE_PKG_X86="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x86.7z"
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
-
-      # 压缩打包
-      - name: Compression x64 📦
-        if: success()
-        shell: pwsh
-        run: |
-          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
-          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
-          ls $env:RELEASE_PATH
-
-      # 生成Release Hash
-      - name: Hash Releases ⌨
-        if: success()
-        shell: pwsh
-        run: |
-          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
-          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
-          ls $env:RELEASE_PATH
-
-      # 发布到Releases
-      - name: Publish to Releases 💸
-        if: success()
-        uses: ncipollo/release-action@v1
-        with:
-          prerelease: ${{ env.GIT_BRANCH != 'release' }}
-          tag: ${{ env.GIT_TAG }}
-          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
-          #          bodyFile: .\CHANGELOG.md
-          bodyFile: .\RELEASELOG.md
-          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
+      #
+      #      # 压缩打包
+      #      - name: Compression x64 📦
+      #        if: success()
+      #        shell: pwsh
+      #        run: |
+      #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
+      #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
+      #          ls $env:RELEASE_PATH
+      #
+      #      # 生成Release Hash
+      #      - name: Hash Releases ⌨
+      #        if: success()
+      #        shell: pwsh
+      #        run: |
+      #          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
+      #          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
+      #          ls $env:RELEASE_PATH
+      #
+      #      # 发布到Releases
+      #      - name: Publish to Releases 💸
+      #        if: success()
+      #        uses: ncipollo/release-action@v1
+      #        with:
+      #          prerelease: ${{ env.GIT_BRANCH != 'release' }}
+      #          tag: ${{ env.GIT_TAG }}
+      #          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
+      #          #          bodyFile: .\CHANGELOG.md
+      #          bodyFile: .\RELEASELOG.md
+      #          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
       # 推送到TG
       - name: Push to TG 📰
@@ -238,26 +238,6 @@ jobs:
         run: |
           LOG_MARKDOWN=(cat ./RELEASELOG.md)
           RLT=(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"$LOG_MARKDOWN","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
-          if [[ `echo $RLT | jq ".ok"` -eq true ]]; then
-            MSG_ID=`echo $RLT | jq ".result.message_id"`
-            DT_STR=`date "+%Y%m%d%H%M%S"`
-            PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
-            PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
-
-            RELEASE_PATH=${{ env.RELEASE_PATH }}
-            RELEASE_PATH=`echo ${RELEASE_PATH//:/}`
-            RELEASE_PATH=`echo ${RELEASE_PATH//\\//}`
-            RLT=(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup' -s --form-string chat_id=${{ env.chat-id }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"$RELEASE_PATH/Clash.Mini*x64*" --form $PART_X86=@"$RELEASE_PATH/Clash.Mini*x86*" --form-string media='[{"type": "document","media": "attach://$PART_X64","caption": "SHA256: `cat $RELEASE_PATH/Clash.Mini*x64*.sha256`","parse_mode": "MarkdownV2"},{"type": "document","media": "attach://$PART_X86","caption": "SHA256: `cat $RELEASE_PATH/Clash.Mini*x86*.sha256`","parse_mode": "MarkdownV2"}]')
-            if [[ `echo $RLT | jq ".ok"` -ne true ]]; then
-              echo "Reply files to channel failed. Response: "
-              echo $RLT | jq .
-              exit 1
-            fi
-          else
-            echo "push to channel failed. Response: "
-            echo $RLT | jq .
-            exit 1
-          fi
 
 #      # 缓存Build文件
 #      - name: Cache node modules
