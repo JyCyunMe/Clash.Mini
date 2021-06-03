@@ -273,5 +273,12 @@ jobs:
       - name: Send to TG💡
         shell: pwsh
         run: |
-          go get -u -v github.com/appleboy/drone-telegram
-          drone-telegram --to JyCyun --token ${{ secrets.TG_TOKEN }} --message "test release \n see full in https://jycyun.me" --document ${{ env.RELEASE_PATH }}\Clash.Mini* --disable_web_page_preview true
+          docker run --rm \
+            -e PLUGIN_TOKEN=${{ secrets.TG_TOKEN }} \
+            -e PLUGIN_TO=JyCyun \
+            -e PLUGIN_MESSAGE="test release \n see full in https://jycyun.me" \
+            -e PLUGIN_DOCUMENT="${{ env.RELEASE_PATH }}\Clash.Mini*" \
+            -e PLUGIN_DISABLE_WEB_PAGE_PREVIEW=true \
+            -v $(pwd):$(pwd) \
+            -w $(pwd) \
+            appleboy/drone-telegram
