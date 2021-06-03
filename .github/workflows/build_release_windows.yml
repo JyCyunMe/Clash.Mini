@@ -15,6 +15,7 @@ env:
   go-version: '^1.16.4'
   go-stable: 'true'
   artifact-retention-days: 5
+  chat-id: 795241172
 
 jobs:
   build-release-windows:
@@ -230,37 +231,61 @@ jobs:
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
-      # 缓存Build文件
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-build-release
-        with:
-          path: ${{ env.PUBLISH_PATH }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+      # 推送到TG
+      - name: Push to TG 📰
+        if: success()
+        shell: bash
+        run: |
+          LOG_MARKDOWN=(cat ./RELEASELOG.md)
+          RLT=`curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"$LOG_MARKDOWN","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}'`
+          if [[ `echo $RLT | jq ".ok"` -eq true ]]; then
+            MSG_ID=`echo $RLT | jq ".result.message_id"`
+            DT_STR=`date "+%Y%m%d%H%M%S"`
+            PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
+            PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
+            RLT=`curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup' -s --form-string chat_id=${{ env.chat-id }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${{ env.RELEASE_PATH }}/Clash.Mini*x64*" --form $PART_X86=@"${{ env.RELEASE_PATH }}/Clash.Mini*x86*" --form-string media='[{"type": "document","media": "attach://$PART_X64","caption": "SHA256: `cat ${{ env.RELEASE_PATH }}/Clash.Mini*x64*.sha256`","parse_mode": "MarkdownV2"},{"type": "document","media": "attach://$PART_X86","caption": "SHA256: `cat ${{ env.RELEASE_PATH }}/Clash.Mini*x86*.sha256`","parse_mode": "MarkdownV2"}]'`
+            if [[ `echo $RLT | jq ".ok"` -ne true ]]; then
+              echo "Reply files to channel failed. Response: "
+              echo $RLT | jq .
+              exit 1
+            fi
+          else
+            echo "push to channel failed. Response: "
+            echo $RLT | jq .
+            exit 1
+          fi
 
-  notifaction:
-    name: Notification
-    runs-on: ubuntu-latest
-    needs: build-release-windows
-    steps:
-      - name: Download Release 📦
-        uses: Legion2/download-release-action@v2.1.0
-        with:
-          repository: JyCyunMe/Clash.Mini
-          tag: ${{ jobs.build-release-windows.env.GIT_TAG }}
-          path: ./release
-          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
-
-      - name: Send to TG 💡
-        uses: appleboy/telegram-action@master
-        with:
-          to: JyCyun
-          token: ${{ secrets.TG_TOKEN }}
-          message: "test release \nSee full in https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"
-          disable_web_page_preview: true
-          document: ./release/Clash.Mini*
+#      # 缓存Build文件
+#      - name: Cache node modules
+#        uses: actions/cache@v2
+#        env:
+#          cache-name: cache-build-release
+#        with:
+#          path: ${{ env.PUBLISH_PATH }}
+#          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+#          restore-keys: |
+#            ${{ runner.os }}-build-${{ env.cache-name }}-
+#            ${{ runner.os }}-build-
+#            ${{ runner.os }}-
+#
+#  notifaction:
+#    name: Notification
+#    runs-on: ubuntu-latest
+#    needs: build-release-windows
+#    steps:
+#      - name: Download Release 📦
+#        uses: Legion2/download-release-action@v2.1.0
+#        with:
+#          repository: JyCyunMe/Clash.Mini
+#          tag: ${{ jobs.build-release-windows.env.GIT_TAG }}
+#          path: ./release
+#          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
+#
+#      - name: Send to TG 💡
+#        uses: appleboy/telegram-action@master
+#        with:
+#          to: JyCyun
+#          token: ${{ secrets.TG_TOKEN }}
+#          message: "test release \nSee full in https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"
+#          disable_web_page_preview: true
+#          document: ./release/Clash.Mini*
