@@ -200,6 +200,18 @@ jobs:
           $RELEASE_PKG_X86="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x86.7z"
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
+          
+          $str = "我是谁"
+          $ustr = ""
+          for($i = 0; $i -lt $str.Length; $i++){
+            if([int]$str[$i] -gt 32 -and [int]$str[$i] -lt 127){
+              $ustr += $str[$i]
+            } else {
+              $ustr += [System.String]::Format("\u{0:x4}", [int]$str[$i])
+            }
+          }
+          ls ${{ env.GITHUB_WORKSPACE }}
+          echo $ustr > ${{ env.GITHUB_WORKSPACE }}\post.txt
       #
       #      # 压缩打包
       #      - name: Compression x64 📦
@@ -237,7 +249,7 @@ jobs:
         shell: bash
         run: |
           ls .
-          LOG_MARKDOWN=$(cat ./RELEASELOG.md)
+          LOG_MARKDOWN=$(cat ./post.txt)
           echo $LOG_MARKDOWN
           echo "LOG_MARKDOWN=$LOG_MARKDOWN" >> $GITHUB_ENV
           RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"${{ env.LOG_MARKDOWN }}","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
