@@ -236,7 +236,9 @@ jobs:
         if: success()
         shell: bash
         run: |
+          ls .
           LOG_MARKDOWN=$(cat ./RELEASELOG.md)
+          echo $LOG_MARKDOWN
           echo "LOG_MARKDOWN=$LOG_MARKDOWN" >> $GITHUB_ENV
           RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"${{ env.LOG_MARKDOWN }}","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
           echo $RLT
