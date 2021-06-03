@@ -123,48 +123,9 @@ jobs:
             echo "This build has been aborted."
             exit 1
           }
-
-      # 配置Golang环境
-      - name: Setup Go Environment 📍
-        uses: actions/setup-go@v2
-        if: success()
-        with:
-          go-version: ${{ env.go-version }}
-          stable: ${{ env.go-stable }}
-
-      # 获取依赖包
-      - name: Get Go Modules 📟
-        if: success()
-        shell: pwsh
-        run: |
-          go version
-          go env
-          go get github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-          go mod vendor -v
-          go generate -x -v .\main.go
           mkdir -p ${env:BUILD_PATH}
-
-      # 运行Golang测试
-      #  - name: Golang Test ✅
-      #      run: |
-
-      # 构建64位应用
-      - name: Build x64 Application 🛠
-        if: success()
-        shell: pwsh
-        run: |
-          $env:GOOS="windows"
-          $env:GOARCH="amd64"
-          go build -ldflags "-H=windowsgui -s -w" -o ${env:BUILD_PATH}\Clash.Mini_x64.exe
-
-      # 构建32位应用
-      - name: Build x86 Application 🛠
-        if: success()
-        shell: pwsh
-        run: |
-          $env:GOOS="windows"
-          $env:GOARCH="386"
-          go build -a -v -x -ldflags "-H=windowsgui -s -w" -o ${env:BUILD_PATH}\Clash.Mini_x86.exe
+          echo "" > ${env:BUILD_PATH}\Clash.Mini_x64.exe
+          echo "" > ${env:BUILD_PATH}\Clash.Mini_x86.exe
 
       # 准备发布PreRelease文件
       - id: prepare-pre-release
@@ -273,4 +234,4 @@ jobs:
       - name: Send to TG💡
         shell: pwsh
         run: |
-          docker run --rm -e PLUGIN_TOKEN=${{ secrets.TG_TOKEN }} -e PLUGIN_TO=JyCyun -e PLUGIN_MESSAGE="test release \n see full in https://jycyun.me" -e PLUGIN_DOCUMENT="${{ env.RELEASE_PATH }}\Clash.Mini*" -e PLUGIN_DISABLE_WEB_PAGE_PREVIEW=true -v $(pwd):$(pwd) -w $(pwd) appleboy/drone-telegram
+          docker run --rm -e PLUGIN_TOKEN="${{ secrets.TG_TOKEN }}" -e PLUGIN_TO=JyCyun -e PLUGIN_MESSAGE="test release \n see full in https://jycyun.me" -e PLUGIN_DOCUMENT="${{ env.RELEASE_PATH }}\Clash.Mini*" -e PLUGIN_DISABLE_WEB_PAGE_PREVIEW=true -v $(pwd):$(pwd) -w $(pwd) appleboy/drone-telegram
