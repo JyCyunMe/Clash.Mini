@@ -201,7 +201,7 @@ jobs:
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
           
-          $str = "我是谁"
+          $str = $(cat ${{ env.GITHUB_WORKSPACE }}\RELEASELOG.MD)
           $ustr = ""
           for($i = 0; $i -lt $str.Length; $i++){
             if([int]$str[$i] -gt 32 -and [int]$str[$i] -lt 127){
