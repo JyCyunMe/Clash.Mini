@@ -237,7 +237,8 @@ jobs:
         shell: bash
         run: |
           LOG_MARKDOWN=(cat ./RELEASELOG.md)
-          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"$LOG_MARKDOWN","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
+          echo "LOG_MARKDOWN=$LOG_MARKDOWN" >> $GITHUB_ENV
+          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"${{ env.LOG_MARKDOWN }}","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
           if [[ $IS_OK -eq true ]]; then
@@ -245,8 +246,6 @@ jobs:
             DT_STR=`date "+%Y%m%d%H%M%S"`
             PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
             PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
-
-
           else
             echo "push to channel failed. Response: "
             echo $RLT | jq .
