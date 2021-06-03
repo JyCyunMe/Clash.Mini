@@ -264,7 +264,17 @@ jobs:
         with:
           prerelease: ${{ env.GIT_BRANCH != 'release' }}
           tag: ${{ env.GIT_TAG }}
-          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*.7z
+          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
           #          bodyFile: .\CHANGELOG.md
           bodyFile: .\RELEASELOG.md
           token: ${{ secrets.ACTION_ACCESS_TOKEN }}
+
+      # 发送到TG群
+      - name: Telegram Message Notify
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ClashMin1
+          token: ${{ secrets.TG_TOKEN }}
+          message: send photo message
+          message_file: ${{ env.RELEASE_PATH }}\Clash.Mini*
+          disable_web_page_preview: true
