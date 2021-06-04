@@ -4,6 +4,11 @@
 
 _Release on \<\[*2021-06-05 05:20*\]\>_
 
+*Features*
+
+1. Verification steps for renewing subscriptions
+2. Correction of the text description of the tray menu
+
 *Fixes*
 
 1. Verification steps for renewing subscriptions
