@@ -1,8 +1,8 @@
 # 推送到TG
 
 pip install requests BeautifulSoup
-py ./release_text.py || {
-  echo -e "\n release_text.py failed."
+python ./release_text.py || {
+  echo -e "\n run release_text.py failed."
   exit 1
 }
 RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -s --form-string chat_id=${CHAT_ID} --form-string text="$(perl -lne 'print;' ./.github/output/release_log)" --form-string parse_mode="HTML" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${GIT_TAG}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
