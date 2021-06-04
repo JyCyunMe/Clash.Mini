@@ -137,11 +137,13 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
-          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
+          $RELEASE_X64_HASH=(Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash
+          $RELEASE_X86_HASH=(Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash
+          echo "$RELEASE_X64_HASH" > "${env:RELEASE_PKG_X64}.sha256"
+          echo "$RELEASE_X86_HASH" > "${env:RELEASE_PKG_X86}.sha256"
           ls $env:RELEASE_PATH
-          echo "::set-output name=sha256-x64::$(cat ${env:RELEASE_PKG_X64}.sha256)"
-          echo "::set-output name=sha256-x86::$(cat ${env:RELEASE_PKG_X86}.sha256)"
+          echo "::set-output name=sha256-x64::$RELEASE_X64_HASH"
+          echo "::set-output name=sha256-x86::$RELEASE_X86_HASH"
 
   #
   #      # 发布到Releases
