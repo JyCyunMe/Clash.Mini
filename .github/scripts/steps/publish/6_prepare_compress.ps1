@@ -28,4 +28,6 @@ $RELEASE_PKG_X64="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x64.7z"
 $RELEASE_PKG_X86="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x86.7z"
 echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
 echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
-echo "::set-output name=release-path::$RELEASE_PATH"
+
+echo ($UNIX_RELEASE_PATH=($RELEASE_PATH -replace '([A-Z]):\\', '/$1/').Replace("\", "/"))
+echo "::set-output name=unix-release-path::$UNIX_RELEASE_PATH"
