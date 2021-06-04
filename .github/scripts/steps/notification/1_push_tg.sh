@@ -1,7 +1,7 @@
 # 推送到TG
 
-pip install requests BeautifulSoup
-python ./release_text.py || {
+pip install requests BeautifulSoup4
+python3 ./release_text.py || {
   echo -e "\n run release_text.py failed."
   exit 1
 }
