@@ -254,13 +254,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
 
+#          RELEASELOG=$(bash ./.github/scripts/udecode.sh ./RELEASELOG.md)
       # 推送到TG
       - name: Push to TG 📰
         if: success()
         shell: bash
         run: |
-          RELEASELOG=$(bash ./.github/scripts/udecode.sh ./RELEASELOG.md)
-          RLT=$(wget --no-check-certificate --quiet --method POST --body-data 'chat_id=795241172&text='$RELEASELOG'&parse_mode=Markdown&disable_web_page_preview=true&allow_sending_without_reply=true&reply_markup={"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/v0.1.3.15-pre"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}' https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage)
+
+          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text="$(perl -lne 'print;' ./RELEASELOG.md)" --form-string parse_mode="Markdown" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+
           if [[ -e $(echo $RLT | jq ".ok") ]]; then
             MSG_ID=$(echo $RLT | jq ".result.message_id")
             DT_STR=$(date "+%Y%m%d%H%M%S")
