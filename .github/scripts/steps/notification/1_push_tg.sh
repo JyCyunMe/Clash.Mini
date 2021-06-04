@@ -1,0 +1,21 @@
+# 推送到TG
+
+pip install requests BeautifulSoup
+py ./release_text.py
+RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -s --form-string chat_id=${CHAT_ID} --form-string text="$(perl -lne 'print;' ./.github/output/release_log)" --form-string parse_mode="HTML" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${GIT_TAG}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+#RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -s --form-string chat_id=${CHAT_ID} --form-string text="$(perl -lne 'print;' ./RELEASELOG.md)" --form-string parse_mode="Markdown" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${GIT_TAG}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+
+if [[ -e $(echo $RLT | jq ".ok") ]]; then
+    MSG_ID=$(echo $RLT | jq ".result.message_id")
+    DT_STR=$(date "+%Y%m%d%H%M%S")
+    PART_X64=$(echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2)
+    PART_X86=$(echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2)
+
+    RELEASE_PATH=RELEASE_PATH
+    RELEASE_PATH=$(echo ${RELEASE_PATH//:/})
+    RELEASE_PATH=$(echo ${RELEASE_PATH//\\//})
+else
+    echo "push to channel failed. Response: "
+    echo $RLT | jq .
+    exit 1
+fi
