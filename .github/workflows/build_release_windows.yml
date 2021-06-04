@@ -259,7 +259,7 @@ jobs:
         if: success()
         shell: bash
         run: |
-          RELEASELOG=$(./.github/scripts/udecode.sh ./RELEASELOG.md)
+          RELEASELOG=$(bash ./.github/scripts/udecode.sh ./RELEASELOG.md)
 
 #      # 缓存Build文件
 #      - name: Cache node modules
