@@ -178,11 +178,23 @@ jobs:
             RELEASE_PATH=${{ needs.build-release-windows.outputs.release-path }}
             RELEASE_PATH=$(echo ${RELEASE_PATH//:/})
             RELEASE_PATH=$(echo ${RELEASE_PATH//\\//})
+
+            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"$RELEASE_PATH/Clash.Mini*x64*" --form $PART_X86=@"$RELEASE_PATH/Clash.Mini*x86*" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: `cat $RELEASE_PATH/Clash.Mini*x64*.sha256`\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: `cat $RELEASE_PATH/Clash.Mini*x86*.sha256`\",\"parse_mode\": \"Markdown\"}]")
+            if [[ ! -e $(echo $RLT | jq ".ok") ]]; then
+              echo "Reply files to channel failed. Response: "
+              echo $RLT | jq .
+              exit 1
+            fi
           else
             echo "push to channel failed. Response: "
             echo $RLT | jq .
             exit 1
           fi
+#        run: bash ./.github/scripts/steps/notification/1_push_tg.sh
+#        env:
+#          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+#          GIT_TAG: ${{ needs.build-release-windows.outputs.git-tag }}
+#          RELEASE_PATH: ${{ needs.build-release-windows.outputs.release-path }}
 
 #      # 缓存Build文件
 #      - name: Cache node modules
