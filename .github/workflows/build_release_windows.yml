@@ -182,8 +182,13 @@ jobs:
             RELEASE_PKG_X64=${{ needs.build-release-windows.outputs.release-pkg-x64 }}
             RELEASE_PKG_X86=${{ needs.build-release-windows.outputs.release-pkg-x86 }}
             RELEASE_URL="https://github.com/JyCyunMe/Clash.Mini/releases/download/${{ needs.build-release-windows.outputs.git-tag }}"
+            ls $RELEASE_URL
             RELEASE_PATH="$(pwd)/releases"
             mkdir -p $RELEASE_PATH
+            echo "${RELEASE_URL}/${RELEASE_PKG_X64}"
+            echo "${RELEASE_URL}/${RELEASE_PKG_X86}"
+            echo "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
+            echo "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
             curl -o "${RELEASE_PATH}/${RELEASE_PKG_X64}" "${RELEASE_URL}/${RELEASE_PKG_X64}"
             curl -o "${RELEASE_PATH}/${RELEASE_PKG_X86}" "${RELEASE_URL}/${RELEASE_PKG_X86}"
             curl -o "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
