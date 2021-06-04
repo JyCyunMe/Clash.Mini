@@ -24,8 +24,8 @@ jobs:
     outputs:
       git-tag: ${{ steps.configurate-build-inforamtion.outputs.git-tag }}
       unix-release-path: ${{ steps.prepare-to-compression.outputs.unix-release-path }}
-      sha256-x64: ${{ steps.prepare-to-compression.outputs.sha256-x64 }}
-      sha256-x86: ${{ steps.prepare-to-compression.outputs.sha256-x86 }}
+      sha256-x64: ${{ steps.hash-releases.outputs.sha256-x64 }}
+      sha256-x86: ${{ steps.hash-releases.outputs.sha256-x86 }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
@@ -132,13 +132,17 @@ jobs:
           ls $env:RELEASE_PATH
 
       # 生成Release Hash
-      - name: Hash Releases ⌨
+      - id: hash-releases
+        name: Hash Releases ⌨
         if: success()
         shell: pwsh
         run: |
           echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
           echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
           ls $env:RELEASE_PATH
+          echo "::set-output name=sha256-x64::$(cat ${env:RELEASE_PKG_X64}.sha256)"
+          echo "::set-output name=sha256-x86::$(cat ${env:RELEASE_PKG_X86}.sha256)"
+
   #
   #      # 发布到Releases
   #      - name: Publish to Releases 💸
@@ -181,7 +185,10 @@ jobs:
             RELEASE_PATH=${{ needs.build-release-windows.outputs.unix-release-path }}
             echo $RELEASE_PATH
 
-            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/Clash.Mini*x64*" --form $PART_X86=@"${RELEASE_PATH}/Clash.Mini*x86*" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: `cat $RELEASE_PATH/Clash.Mini*x64*.sha256`\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: `cat $RELEASE_PATH/Clash.Mini*x86*.sha256`\",\"parse_mode\": \"Markdown\"}]")
+            ls $RELEASE_PATH
+
+            echo ${{ needs.build-release-windows.outputs.sha256-x64 }}
+            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/Clash.Mini*x64*" --form $PART_X86=@"${RELEASE_PATH}/Clash.Mini*x86*" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${{ needs.build-release-windows.outputs.sha256-x64 }}\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${{ needs.build-release-windows.outputs.sha256-x86 }}\",\"parse_mode\": \"Markdown\"}]")
             IS_OK=$(echo $RLT | jq ".ok")
             if [ ! -e $IS_OK ]; then
               echo "Reply files to channel failed. Response: "
