@@ -259,6 +259,8 @@ jobs:
         if: success()
         shell: bash
         run: |
+          RELEASELOG=$(bash ./.github/scripts/udecode.sh ./RELEASELOG.md)
+          RELEASELOG=${RELEASELOG/\\\\//\\}
           RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text="$(cat ./RELEASELOG.md)" --form-string parse_mode="Markdown" --form-string 'disable_web_page_preview="true"' --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
