@@ -42,31 +42,7 @@ jobs:
       # 获取Git信息
       - name: Get Git Info 💡
         shell: pwsh
-        run: |
-          echo "WORKDIR=$pwd" >> $env:GITHUB_ENV
-          $GIT_BRANCH=$env:GITHUB_REF -replace "refs/heads/", ""
-          $VERSION_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?(-pre)?$"
-          $VERSION_RELEASE_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?$"
-          $VERSION_PRE_REGEXP="^v?\d+\.\d+\.\d+(\.\d+)?-pre$"
-          echo "VERSION_REGEXP=$VERSION_REGEXP" >> $env:GITHUB_ENV
-          echo "VERSION_RELEASE_REGEXP=$VERSION_RELEASE_REGEXP" >> $env:GITHUB_ENV
-          echo "VERSION_PRE_REGEXP=$VERSION_PRE_REGEXP" >> $env:GITHUB_ENV
-          $GIT_BRANCH=$env:GITHUB_REF -replace "refs/heads/", ""
-          echo "GIT_BRANCH=$GIT_BRANCH" >> $env:GITHUB_ENV
-          echo "Current Branch: $GIT_BRANCH"
-
-          $SHORT_SHA=${env:GITHUB_SHA}.Substring(0,7)
-          echo "SHORT_SHA=$SHORT_SHA" >> $env:GITHUB_ENV
-          echo "Current commit hash id: ${env:GITHUB_SHA} ($SHORT_SHA)"
-
-          $GIT_TAG_RELEASE_VERSION=git tag -l | where { $_ -match $VERSION_RELEASE_REGEXP } | sort -descending -top 1
-          $GIT_TAG_PRE_VERSION=git tag -l | where { $_ -match $VERSION_PRE_REGEXP } | sort -descending -top 1
-          if ($GIT_TAG_PRE_VERSION -eq $GIT_TAG_RELEASE_VERSION + "-pre") { $GIT_TAG_LATEST=$GIT_TAG_RELEASE_VERSION }
-            else { $GIT_TAG_LATEST=@($GIT_TAG_RELEASE_VERSION, $GIT_TAG_PRE_VERSION) | sort -descending -top 1 }
-          echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
-          echo "Latest Tag: $GIT_TAG_LATEST"
-          dir "C:\Program Files"
-          dir "C:\Program Files (x86)"
+        run: pwsh -f .\.github\scripts\steps\publish\1_get_info.ps1
 
       # 配置构建信息
       - id: configurate-build-inforamtion
@@ -139,18 +115,17 @@ jobs:
           echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
           ls $env:RELEASE_PATH
 
-  #
-  #      # 发布到Releases
-  #      - name: Publish to Releases 💸
-  #        if: success()
-  #        uses: ncipollo/release-action@v1
-  #        with:
-  #          prerelease: ${{ env.GIT_BRANCH != 'release' }}
-  #          tag: ${{ env.GIT_TAG }}
-  #          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
-  #          #          bodyFile: .\CHANGELOG.md
-  #          bodyFile: .\RELEASELOG.md
-  #          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
+      # 发布到Releases
+      - name: Publish to Releases 💸
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: ${{ env.GIT_BRANCH != 'release' }}
+          tag: ${{ env.GIT_TAG }}
+          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
+          #          bodyFile: .\CHANGELOG.md
+          bodyFile: .\RELEASELOG.md
+          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
   notifaction:
     name: Notification
