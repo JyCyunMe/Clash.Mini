@@ -132,7 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-release-windows
     env:
-      CHAT_ID: 795241172
+      CHAT_ID: ${{ secrets.CHAT_ID }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
