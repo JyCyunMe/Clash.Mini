@@ -260,7 +260,7 @@ jobs:
         shell: bash
         run: |
           RELEASELOG=$(bash ./.github/scripts/udecode.sh ./RELEASELOG.md)
-          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text=\"$(echo -e $RELEASELOG)\" --form-string parse_mode="Markdown" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text=\""$RELEASELOG"\" --form-string parse_mode="Markdown" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
           if [[ -e $(echo $RLT | jq ".ok") ]]; then
             MSG_ID=$(echo $RLT | jq ".result.message_id")
             DT_STR=$(date "+%Y%m%d%H%M%S")
