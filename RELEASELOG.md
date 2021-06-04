@@ -1,10 +1,10 @@
-## Release Log
-👌😀测试a试试就是是👏
-### *v0.1.2.1-pre*
+# Release Log
 
-Release on *2021-05-30 00:50*
+`v0.1.3.16-pre`
 
-**Fixes**
+_Release on <[*2021-06-05 05:20*]>_
+
+*Fixes*
 
 1. Verification steps for renewing subscriptions
 2. Correction of the text description of the tray menu
