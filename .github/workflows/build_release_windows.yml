@@ -241,8 +241,8 @@ jobs:
         run: |
           LOG_MARKDOWN=$(sh ./.github/scripts/udecode.sh ./RELEASELOG.md)
           echo $LOG_MARKDOWN
-          CURL_OPTIONS="'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{\"chat_id\":${{ env.chat-id }},\"text\":\"$LOG_MARKDOWN\",\"parse_mode\":\"MarkdownV2\",\"disable_web_page_preview\":true,\"allow_sending_without_reply\":true,\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}}'"
-          RLT=$(curl --location --request POST CURL_OPTIONS)
+          CURL_OPTIONS="--data-raw '{\"chat_id\":${{ env.chat-id }},\"text\":\"$LOG_MARKDOWN\",\"parse_mode\":\"MarkdownV2\",\"disable_web_page_preview\":true,\"allow_sending_without_reply\":true,\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}}'"
+          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' -s --header 'Content-Type: application/json' $CURL_OPTIONS)
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
           if [[ $IS_OK -eq true ]]; then
