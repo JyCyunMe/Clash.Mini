@@ -24,6 +24,8 @@ jobs:
     outputs:
       git-tag: ${{ steps.configurate-build-inforamtion.outputs.git-tag }}
       unix-release-path: ${{ steps.prepare-to-compression.outputs.unix-release-path }}
+      sha256-x64: ${{ steps.prepare-to-compression.outputs.sha256-x64 }}
+      sha256-x86: ${{ steps.prepare-to-compression.outputs.sha256-x86 }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
@@ -120,23 +122,23 @@ jobs:
         shell: pwsh
         run: pwsh -f .\.github\scripts\steps\publish\6_prepare_compress.ps1
 
-  #      # 压缩打包
-  #      - name: Compression x64 📦
-  #        if: success()
-  #        shell: pwsh
-  #        run: |
-  #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
-  #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
-  #          ls $env:RELEASE_PATH
-  #
-  #      # 生成Release Hash
-  #      - name: Hash Releases ⌨
-  #        if: success()
-  #        shell: pwsh
-  #        run: |
-  #          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
-  #          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
-  #          ls $env:RELEASE_PATH
+      # 压缩打包
+      - name: Compression x64 📦
+        if: success()
+        shell: pwsh
+        run: |
+          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
+          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
+          ls $env:RELEASE_PATH
+
+      # 生成Release Hash
+      - name: Hash Releases ⌨
+        if: success()
+        shell: pwsh
+        run: |
+          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
+          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
+          ls $env:RELEASE_PATH
   #
   #      # 发布到Releases
   #      - name: Publish to Releases 💸
