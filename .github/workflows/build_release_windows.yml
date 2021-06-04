@@ -15,13 +15,15 @@ env:
   go-version: '^1.16.4'
   go-stable: 'true'
   artifact-retention-days: 5
-  chat-id: 795241172
 
 jobs:
   build-release-windows:
     name: Build (Pre)Release Windows
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
+    outputs:
+      git-tag: ${{ steps.configurate-build-inforamtion.outputs.git-tag }}
+      release-path: ${{ steps.prepare-to-compression.outputs.release-path }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
@@ -58,7 +60,8 @@ jobs:
           echo "Latest Tag: $GIT_TAG_LATEST"
 
       # 配置构建信息
-      - name: Configurate Build Information 🖨
+      - id: configurate-build-inforamtion
+        name: Configurate Build Information 🖨
         if: success()
         shell: pwsh
         run: |
@@ -73,6 +76,7 @@ jobs:
           $GIT_TAG="v$BUILD_VERSION$(${env:GIT_BRANCH} -ne 'release' ? '-pre' : '')"
           echo "GIT_TAG=$GIT_TAG" >> $env:GITHUB_ENV
           echo "Current Tag: $GIT_TAG"
+          echo "::set-output name=git-tag::$GIT_TAG"
 
       # 构建前检查
       - name: Check on Failures ❌
@@ -177,7 +181,8 @@ jobs:
           ls ${env:PUBLISH_PATH}
 
       # 准备压缩
-      - name: Prepare to Compression 🕹
+      - id: prepare-to-compression
+        name: Prepare to Compression 🕹
         if: success()
         shell: pwsh
         run: |
@@ -202,6 +207,7 @@ jobs:
           $RELEASE_PKG_X86="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x86.7z"
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
+          echo "::set-output name=release-path::$RELEASE_PATH"
 
       #
       #      # 压缩打包
@@ -234,14 +240,20 @@ jobs:
       #          bodyFile: .\RELEASELOG.md
       #          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
+  notifaction:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: build-release-windows
+    env:
+      chat-id: 795241172
+    steps:
       # 推送到TG
       - name: Push to TG 📰
         if: success()
         shell: bash
         run: |
           RELEASELOG=$(sh ./.github/scripts/udecode.sh ./RELEASELOG.md)
-          RELEASELOG=${RELEASELOG//\\/\\\\}
-          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text="$RELEASELOG" --form-string parse_mode="Markdown" --form-string 'disable_web_page_preview="true"' --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text="$RELEASELOG" --form-string parse_mode="Markdown" --form-string 'disable_web_page_preview="true"' --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
           if [[ -e $IS_OK ]]; then
