@@ -43,9 +43,9 @@ do
 	elif [[ $((0x${tbts[0]}>>3)) -eq 30 ]]
 	then
 		utf16b=$( printf "%08x" $(( (((0x${tbts[0]}&7)<<6|(0x${tbts[1]}&63))<<6|(0x${tbts[2]}&63))<<6|(0x${tbts[3]}&63) )) )
-    echo -en "\u$utf16b"
-#		echo -n "\u${utf16b:0:4}"
-#		echo -n "\u${utf16b:4:8}"
+#    echo -en "\u$utf16b"
+		echo -n "\u${utf16b:0:4}"
+		echo -n "\u${utf16b:4:8}"
 #		echo -n \\U$( printf "%08x" $(( (((0x${tbts[0]}&7)<<6|(0x${tbts[1]}&63))<<6|(0x${tbts[2]}&63))<<6|(0x${tbts[3]}&63) )) )
 		tbts=(${tbts[@]:4})
 	else
