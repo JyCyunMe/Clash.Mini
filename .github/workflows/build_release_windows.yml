@@ -247,6 +247,13 @@ jobs:
     env:
       chat-id: 795241172
     steps:
+      # 拉取项目代码
+      - name: Checkout 🔀
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
       # 推送到TG
       - name: Push to TG 📰
         if: success()
@@ -261,6 +268,7 @@ jobs:
             DT_STR=`date "+%Y%m%d%H%M%S"`
             PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
             PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
+
           else
             echo "push to channel failed. Response: "
             echo $RLT | jq .
