@@ -72,20 +72,20 @@ jobs:
         name: Configurate Build Information 🖨
         if: success()
         shell: pwsh
-        run: pwsh -f .\.github\steps\publish\2_configuration.ps1
+        run: pwsh -f .\.github\scripts\steps\publish\2_configuration.ps1
 
       # 构建前检查
       - name: Check on Failures ❌
         if: success()
         shell: pwsh
-        run: pwsh -f .\.github\steps\publish\3_checks.ps1
+        run: pwsh -f .\.github\scripts\steps\publish\3_checks.ps1
 
       # 准备发布PreRelease文件
       - id: prepare-pre-release
         name: Prepare to Publish PreRelease 🕹
         if: ${{ env.GIT_BRANCH != 'release' && success() }}
         shell: pwsh
-        run: pwsh -f .\.github\steps\publish\4_prepare_pre.ps1
+        run: pwsh -f .\.github\scripts\steps\publish\4_prepare_pre.ps1
 
       # 上传64位应用到Actions Artifacts
       - name: Upload x64 Application to Artifacts 📤
@@ -111,14 +111,14 @@ jobs:
       - name: Prepare to Publish Release 🕹
         if: ${{ env.GIT_BRANCH == 'release' && success() }}
         shell: pwsh
-        run: pwsh -f .\.github\steps\publish\5_prepare_release.ps1
+        run: pwsh -f .\.github\scripts\steps\publish\5_prepare_release.ps1
 
       # 准备压缩
       - id: prepare-to-compression
         name: Prepare to Compression 🕹
         if: success()
         shell: pwsh
-        run: pwsh -f .\.github\steps\publish\6_prepare_compress.ps1
+        run: pwsh -f .\.github\scripts\steps\publish\6_prepare_compress.ps1
 
       #
       #      # 压缩打包
