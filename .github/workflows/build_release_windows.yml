@@ -120,35 +120,35 @@ jobs:
         shell: pwsh
         run: pwsh -f .\.github\scripts\steps\publish\6_prepare_compress.ps1
 
-      # 压缩打包
-      - name: Compression x64 📦
-        if: success()
-        shell: pwsh
-        run: |
-          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
-          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
-          ls $env:RELEASE_PATH
-
-      # 生成Release Hash
-      - name: Hash Releases ⌨
-        if: success()
-        shell: pwsh
-        run: |
-          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
-          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
-          ls $env:RELEASE_PATH
-
-      # 发布到Releases
-      - name: Publish to Releases 💸
-        if: success()
-        uses: ncipollo/release-action@v1
-        with:
-          prerelease: ${{ env.GIT_BRANCH != 'release' }}
-          tag: ${{ env.GIT_TAG }}
-          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
-          #          bodyFile: .\CHANGELOG.md
-          bodyFile: .\RELEASELOG.md
-          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
+  #      # 压缩打包
+  #      - name: Compression x64 📦
+  #        if: success()
+  #        shell: pwsh
+  #        run: |
+  #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X64} ${env:PUBLISH_PATH_X64}\*
+  #          7z a -t7z -mx=9 ${env:RELEASE_PKG_X86} ${env:PUBLISH_PATH_X86}\*
+  #          ls $env:RELEASE_PATH
+  #
+  #      # 生成Release Hash
+  #      - name: Hash Releases ⌨
+  #        if: success()
+  #        shell: pwsh
+  #        run: |
+  #          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
+  #          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
+  #          ls $env:RELEASE_PATH
+  #
+  #      # 发布到Releases
+  #      - name: Publish to Releases 💸
+  #        if: success()
+  #        uses: ncipollo/release-action@v1
+  #        with:
+  #          prerelease: ${{ env.GIT_BRANCH != 'release' }}
+  #          tag: ${{ env.GIT_TAG }}
+  #          artifacts: ${{ env.RELEASE_PATH }}\Clash.Mini*
+  #          #          bodyFile: .\CHANGELOG.md
+  #          bodyFile: .\RELEASELOG.md
+  #          token: ${{ secrets.ACTION_ACCESS_TOKEN }}
 
   notifaction:
     name: Notification
@@ -168,12 +168,21 @@ jobs:
       - name: Push to TG 📰
         if: success()
         shell: bash
-        run: bash ./.github/scripts/steps/notification/1_push_tg.sh
-        env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          GIT_TAG: ${{ needs.build-release-windows.outputs.git-tag }}
-          RELEASE_PATH: ${{ needs.build-release-windows.outputs.release-path }}
-
+        run: |
+          RLT=$(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage -s --form-string chat_id=${{ env.chat-id }} --form-string text="$(perl -lne 'print;' ./RELEASELOG.md)" --form-string parse_mode="Markdown" --form-string disable_web_page_preview="true" --form-string allow_sending_without_reply="true" --form-string reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ needs.build-release-windows.outputs.git-tag }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}")
+          if [[ -e $(echo $RLT | jq ".ok") ]]; then
+            MSG_ID=$(echo $RLT | jq ".result.message_id")
+            DT_STR=$(date "+%Y%m%d%H%M%S")
+            PART_X64=$(echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2)
+            PART_X86=$(echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2)
+            RELEASE_PATH=${{ needs.build-release-windows.outputs.release-path }}
+            RELEASE_PATH=$(echo ${RELEASE_PATH//:/})
+            RELEASE_PATH=$(echo ${RELEASE_PATH//\\//})
+          else
+            echo "push to channel failed. Response: "
+            echo $RLT | jq .
+            exit 1
+          fi
 #      # 缓存Build文件
 #      - name: Cache node modules
 #        uses: actions/cache@v2
