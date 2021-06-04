@@ -23,9 +23,8 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
     outputs:
       git-tag: ${{ steps.configurate-build-inforamtion.outputs.git-tag }}
-      unix-release-path: ${{ steps.prepare-to-compression.outputs.unix-release-path }}
-      sha256-x64: ${{ steps.hash-releases.outputs.sha256-x64 }}
-      sha256-x86: ${{ steps.hash-releases.outputs.sha256-x86 }}
+      release-pkg-x64: ${{ steps.prepare-to-compression.outputs.release-pkg-x64 }}
+      release-pkg-x86: ${{ steps.prepare-to-compression.outputs.release-pkg-x86 }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
@@ -132,18 +131,13 @@ jobs:
           ls $env:RELEASE_PATH
 
       # 生成Release Hash
-      - id: hash-releases
-        name: Hash Releases ⌨
+      - name: Hash Releases ⌨
         if: success()
         shell: pwsh
         run: |
-          $RELEASE_X64_HASH=(Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash
-          $RELEASE_X86_HASH=(Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash
-          echo "$RELEASE_X64_HASH" > "${env:RELEASE_PKG_X64}.sha256"
-          echo "$RELEASE_X86_HASH" > "${env:RELEASE_PKG_X86}.sha256"
+          echo (Get-FileHash ${env:RELEASE_PKG_X64} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X64}.sha256"
+          echo (Get-FileHash ${env:RELEASE_PKG_X86} -Algorithm SHA256).Hash > "${env:RELEASE_PKG_X86}.sha256"
           ls $env:RELEASE_PATH
-          echo "::set-output name=sha256-x64::$RELEASE_X64_HASH"
-          echo "::set-output name=sha256-x86::$RELEASE_X86_HASH"
 
   #
   #      # 发布到Releases
@@ -184,13 +178,21 @@ jobs:
             DT_STR=$(date "+%Y%m%d%H%M%S")
             PART_X64=$(echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2)
             PART_X86=$(echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2)
-            RELEASE_PATH=${{ needs.build-release-windows.outputs.unix-release-path }}
-            echo $RELEASE_PATH
 
+            RELEASE_PKG_X64=${{ needs.build-release-windows.outputs.release-pkg-x64 }}
+            RELEASE_PKG_X86=${{ needs.build-release-windows.outputs.release-pkg-x86 }}
+            RELEASE_URL="https://github.com/JyCyunMe/Clash.Mini/releases/download/${{ needs.build-release-windows.outputs.git-tag }}"
+            RELEASE_PATH="${pwd}/releases"
+            mkdir -p $RELEASE_PATH
+            curl -o "${RELEASE_PATH}/{$RELEASE_PKG_X64}" "${RELEASE_URL}/${RELEASE_PKG_X64}"
+            curl -o "${RELEASE_PATH}/{$RELEASE_PKG_X86}" "${RELEASE_URL}/${RELEASE_PKG_X86}"
+            curl -o "${RELEASE_PATH}/{$RELEASE_PKG_X64}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
+            curl -o "${RELEASE_PATH}/{$RELEASE_PKG_X86}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
             ls $RELEASE_PATH
 
-            echo ${{ needs.build-release-windows.outputs.sha256-x64 }}
-            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/Clash.Mini*x64*" --form $PART_X86=@"${RELEASE_PATH}/Clash.Mini*x86*" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${{ needs.build-release-windows.outputs.sha256-x64 }}\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${{ needs.build-release-windows.outputs.sha256-x86 }}\",\"parse_mode\": \"Markdown\"}]")
+            RELEASE_SHA256_X64=$(cat "${RELEASE_PATH}/{$RELEASE_PKG_X64}.sha256")
+            RELEASE_SHA256_X86=$(cat "${RELEASE_PATH}/{$RELEASE_PKG_X86}.sha256")
+            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/{$RELEASE_PKG_X64}" --form $PART_X86=@"${RELEASE_PATH}/{$RELEASE_PKG_X86}" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"}]")
             IS_OK=$(echo $RLT | jq ".ok")
             if [ ! -e $IS_OK ]; then
               echo "Reply files to channel failed. Response: "
