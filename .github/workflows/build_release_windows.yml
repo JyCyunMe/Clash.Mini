@@ -202,18 +202,7 @@ jobs:
           $RELEASE_PKG_X86="$RELEASE_PATH\Clash.Mini_${env:GIT_TAG}_x86.7z"
           echo "RELEASE_PKG_X64=$RELEASE_PKG_X64" >> $env:GITHUB_ENV
           echo "RELEASE_PKG_X86=$RELEASE_PKG_X86" >> $env:GITHUB_ENV
-          
-          $str = $(cat ${env:WORKDIR}\RELEASELOG.MD)
-          $ustr = ""
-          for($i = 0; $i -lt $str.Length; $i++){
-            if([int]$str[$i] -gt 32 -and [int]$str[$i] -lt 127){
-              $ustr += $str[$i]
-            } else {
-              $ustr += [System.String]::Format("\u{0:x4}", [int]$str[$i])
-            }
-          }
-          ls ${env:WORKDIR}
-          echo $ustr > ${env:WORKDIR}\post.txt
+
       #
       #      # 压缩打包
       #      - name: Compression x64 📦
@@ -250,11 +239,11 @@ jobs:
         if: success()
         shell: bash
         run: |
-          ls .
-          LOG_MARKDOWN=$(cat ./post.txt)
+          LOG_MARKDOWN=$(sh ./.github/scripts/udecode.sh ./RELEASELOG.md)
           echo $LOG_MARKDOWN
-          echo "LOG_MARKDOWN=$LOG_MARKDOWN" >> $GITHUB_ENV
-          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"${{ env.LOG_MARKDOWN }}","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}')
+          TPL_1='https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' --header 'Content-Type: application/json' -s --data-raw '{"chat_id":${{ env.chat-id }},"text":"'
+          TPL_2='","parse_mode":"MarkdownV2","disable_web_page_preview":true,"allow_sending_without_reply":true,"reply_markup":{"inline_keyboard":[[{"text":"Download","url":"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}"},{"text":"GitHub","url":"https://github.com/JyCyunMe/Clash.Mini"}]]}}'
+          RLT=$(curl --location --request POST $TPL_1$LOG_MARKDOWN$TPL_2)
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
           if [[ $IS_OK -eq true ]]; then
@@ -262,6 +251,18 @@ jobs:
             DT_STR=`date "+%Y%m%d%H%M%S"`
             PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
             PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
+
+
+            IS_OK=(echo $RLT | jq ".ok")
+            RELEASE_PATH=${{ env.RELEASE_PATH }}
+            RELEASE_PATH=`echo ${RELEASE_PATH//:/}`
+            RELEASE_PATH=`echo ${RELEASE_PATH//\\//}`
+            RLT=(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup' -s --form-string chat_id=${{ env.chat-id }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"$RELEASE_PATH/Clash.Mini*x64*" --form $PART_X86=@"$RELEASE_PATH/Clash.Mini*x86*" --form-string media='[{"type": "document","media": "attach://$PART_X64","caption": "SHA256: `cat $RELEASE_PATH/Clash.Mini*x64*.sha256`","parse_mode": "MarkdownV2"},{"type": "document","media": "attach://$PART_X86","caption": "SHA256: `cat $RELEASE_PATH/Clash.Mini*x86*.sha256`","parse_mode": "MarkdownV2"}]')
+            if [[ `echo $RLT | jq ".ok"` -ne true ]]; then
+              echo "Reply files to channel failed. Response: "
+              echo $RLT | jq .
+              exit 1
+            fi
           else
             echo "push to channel failed. Response: "
             echo $RLT | jq .
