@@ -188,17 +188,17 @@ jobs:
             echo "${RELEASE_URL}/${RELEASE_PKG_X86}"
             echo "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
             echo "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
-            curl -o "${RELEASE_PATH}/${RELEASE_PKG_X64}" "${RELEASE_URL}/${RELEASE_PKG_X64}"
-            curl -o "${RELEASE_PATH}/${RELEASE_PKG_X86}" "${RELEASE_URL}/${RELEASE_PKG_X86}"
-            curl -o "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
-            curl -o "${RELEASE_PATH}/${RELEASE_PKG_X86}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
+            curl -o -L "${RELEASE_PATH}/${RELEASE_PKG_X64}" "${RELEASE_URL}/${RELEASE_PKG_X64}"
+            curl -o -L "${RELEASE_PATH}/${RELEASE_PKG_X86}" "${RELEASE_URL}/${RELEASE_PKG_X86}"
+            curl -o -L "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
+            curl -o -L "${RELEASE_PATH}/${RELEASE_PKG_X86}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
             ls -lah $RELEASE_PATH
             cat "${RELEASE_PATH}/${RELEASE_PKG_X86}"
             cat "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256"
 
             RELEASE_SHA256_X64=$(cat "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256")
             RELEASE_SHA256_X86=$(cat "${RELEASE_PATH}/${RELEASE_PKG_X86}.sha256")
-            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/{$RELEASE_PKG_X64}" --form $PART_X86=@"${RELEASE_PATH}/{$RELEASE_PKG_X86}" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"}]")
+            RLT=(curl --location --request POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMediaGroup -s --form-string chat_id=${{ env.CHAT_ID }} --form-string reply_to_message_id=$MSG_ID --form $PART_X64=@"${RELEASE_PATH}/${RELEASE_PKG_X64}" --form $PART_X86=@"${RELEASE_PATH}/${RELEASE_PKG_X86}" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${RELEASE_SHA256_X64}\",\"parse_mode\": \"Markdown\"}]")
             IS_OK=$(echo $RLT | jq ".ok")
             if [ ! -e $IS_OK ]; then
               echo "Reply files to channel failed. Response: "
