@@ -1,7 +1,7 @@
 # 推送到TG
 
 pip install requests BeautifulSoup4
-python3 ./release_text.py || {
+python3 ./.github/scripts/steps/notification/release_text.py || {
   echo -e "\n run release_text.py failed."
   exit 1
 }
