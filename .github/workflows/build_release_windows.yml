@@ -193,8 +193,6 @@ jobs:
             curl -L -o "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X64}.sha256"
             curl -L -o "${RELEASE_PATH}/${RELEASE_PKG_X86}.sha256" "${RELEASE_URL}/${RELEASE_PKG_X86}.sha256"
             ls -lah $RELEASE_PATH
-            cat "${RELEASE_PATH}/${RELEASE_PKG_X86}"
-            cat "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256"
 
             RELEASE_SHA256_X64=$(cat "${RELEASE_PATH}/${RELEASE_PKG_X64}.sha256")
             RELEASE_SHA256_X86=$(cat "${RELEASE_PATH}/${RELEASE_PKG_X86}.sha256")
