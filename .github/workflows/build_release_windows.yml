@@ -240,23 +240,10 @@ jobs:
         shell: bash
         run: |
           RELEASELOG=$(sh ./.github/scripts/udecode.sh ./RELEASELOG.md)
-          CURL_OPTIONS="--data-raw '{\"chat_id\":${{ env.chat-id }},\"text\":\"${RELEASELOG}\",\"parse_mode\":\"Markdown\",\"disable_web_page_preview\":true,\"allow_sending_without_reply\":true,\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/${{ env.GIT_TAG }}\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}}'"
-          CURL_OPTIONS=${CURL_OPTIONS//\\/\\\\}
-          CURL_OPTIONS=${CURL_OPTIONS//\"/\\\"}
-          echo $CURL_OPTIONS
-          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' -s --header 'Content-Type: application/json' $CURL_OPTIONS)
+          RELEASELOG=${RELEASELOG//\\/\\\\}
+          RLT=$(curl --location --request POST 'https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage' -s --form-string chat_id=${{ env.chat-id }} --form 'text="$RELEASELOG"' --form 'parse_mode="Markdown"' --form 'disable_web_page_preview="true"' --form 'allow_sending_without_reply="true"' --form 'reply_markup="{\"inline_keyboard\":[[{\"text\":\"Download\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini/releases/tag/v0.1.3.15-pre\"},{\"text\":\"GitHub\",\"url\":\"https://github.com/JyCyunMe/Clash.Mini\"}]]}"'
           echo $RLT
           IS_OK=`echo $RLT | jq ".ok"`
-          if [[ -e $IS_OK ]]; then
-            MSG_ID=`echo $RLT | jq ".result.message_id"`
-            DT_STR=`date "+%Y%m%d%H%M%S"`
-            PART_X64=`echo "${DT_STR}_Clash.Mini_X64" | base64 | tr -s "=" 2`
-            PART_X86=`echo "${DT_STR}_Clash.Mini_X86" | base64 | tr -s "=" 2`
-          else
-            echo "push to channel failed. Response: "
-            echo $RLT | jq .
-            exit 1
-          fi
 
 #      # 缓存Build文件
 #      - name: Cache node modules
