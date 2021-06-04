@@ -19,14 +19,14 @@ do
 		then
       echo -en \\u$( printf "%04x" $(( 0x${tbts[0]})) )
 		else
-		  if [[
-		  ($((0x${tbts[0]})) -ge 0x21 && $((0x${tbts[0]})) -le 0x2F)
-		  || ($((0x${tbts[0]})) -ge 0x3A && $((0x${tbts[0]})) -le 0x40)
-		  || ($((0x${tbts[0]})) -ge 0x5B && $((0x${tbts[0]})) -le 0x60)
-		  || ($((0x${tbts[0]})) -ge 0x7B && $((0x${tbts[0]})) -le 0x7E)
-		  ]]; then
-		    echo -n "\u005c"
-		  fi
+#		  if [[
+#		  ($((0x${tbts[0]})) -ge 0x21 && $((0x${tbts[0]})) -le 0x2F)
+#		  || ($((0x${tbts[0]})) -ge 0x3A && $((0x${tbts[0]})) -le 0x40)
+#		  || ($((0x${tbts[0]})) -ge 0x5B && $((0x${tbts[0]})) -le 0x60)
+#		  || ($((0x${tbts[0]})) -ge 0x7B && $((0x${tbts[0]})) -le 0x7E)
+#		  ]]; then
+#		    echo -n "\u005c"
+#		  fi
 			echo -n \\u$( printf "%04x" $(( 0x${tbts[0]})) )
 		fi
 		tbts=(${tbts[@]:1})
