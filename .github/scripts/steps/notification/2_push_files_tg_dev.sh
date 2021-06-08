@@ -7,6 +7,7 @@ PART_X86=$(echo "${DT_STR}_Clash.Mini_X86_${GITHUB_SHA}" | base64 | tr -s "=" 2)
 RUNNER_URL="https://github.com/JyCyunMe/Clash.Mini/actions/runs/${GITHUB_RUN_ID}"
 echo "$RUNNER_URL"
 ls -lah "$ARTIFACTS_PATH"
+ls -R "$ARTIFACTS_PATH"
 
 ARTIFACT_X64_SHA256=$(cat "${ARTIFACTS_PATH}/${BUILD_X64_FILENAME}.sha256" | tr -d "\n")
 ARTIFACT_X86_SHA256=$(cat "${ARTIFACTS_PATH}/${BUILD_X64_FILENAME}.sha256" | tr -d "\n")
