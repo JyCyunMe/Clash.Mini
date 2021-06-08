@@ -157,7 +157,7 @@ jobs:
   notifaction:
     name: Notification
     runs-on: ubuntu-latest
-    needs: build-release-windows
+    needs: build-dev-windows
     env:
       UPLOAD_CHAT_ID: ${{ secrets.UPLOAD_CHAT_ID }}
     steps:
