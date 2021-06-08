@@ -176,7 +176,7 @@ jobs:
         shell: bash
         run: |
           ARTIFACTS_PATH="${{ steps.download-artifacts.outputs.download-path }}"
-          ls $ARTIFACTS_PATH
+          ls -lha $ARTIFACTS_PATH
 
       # 推送到TG
       - name: Push to TG 📰
