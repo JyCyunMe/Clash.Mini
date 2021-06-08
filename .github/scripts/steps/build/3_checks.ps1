@@ -7,7 +7,7 @@ echo "Latest Tag: ${Env:GIT_TAG_LATEST}`nLatest Release Tag: ${Env:GIT_TAG_RELEA
 if (!(${Env:GIT_TAG} -match ${Env:VERSION_REGEXP}) -or ${Env:GIT_TAG} -eq "")
 {
     $NOT_PASSED = 1
-    echo "Cannot get the version information or it's incorrect."
+    echo "::error file=scripts/steps/build/3_checks.ps1,line=10,col=1::Cannot get the version information or it's incorrect."
 }
 if ($NOT_PASSED -eq 0)
 {
@@ -51,7 +51,7 @@ if ($NOT_PASSED -eq 0)
 if (($NOT_PASSED -eq 0) -and (($productVersion -ne $fileVersion) -or (${Env:BUILD_VERSION} -ne $productVersion)))
 {
     $NOT_PASSED = 1
-    echo "The version information has some differences.`nPlease check `"versioninfo.json`""
+    echo "::error file=scripts/steps/build/3_checks.ps1,line=54,col=1::The version information has some differences.`nPlease check `"versioninfo.json`""
 }
 (git tag -l | where { $_ -eq "v0.1.3.21-pre" }).Count
 
@@ -64,11 +64,10 @@ if (($NOT_PASSED -eq 0) -and (((git tag -l | where { $_ -eq ${Env:GIT_TAG} }).Co
         )))
 {
     $NOT_PASSED = 1
-    echo "A newer or the current version already exists."
+    echo "::error file=scripts/steps/build/3_checks.ps1,line=67,col=1::A newer or the current version already exists."
 }
 if ($NOT_PASSED -ne 0)
 {
-    echo "Check the version information is not passed."
-    echo "This build has been aborted."
+    echo "::error file=scripts/steps/build/3_checks.ps1,line=71,col=1::Check the version information is not passed."
     exit 1
 }

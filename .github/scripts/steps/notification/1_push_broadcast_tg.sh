@@ -12,7 +12,8 @@ if [ $IS_OK ]; then
   MSG_ID=$(echo $RLT | jq ".result.message_id")
   echo "::set-output name=push-msg-id::$MSG_ID"
 else
-  echo "push to channel failed. Response: "
+  echo "::error file=scripts/steps/notification/1_push_broadcast_tg.sh,line=15,col=1::push to channel failed."
+  echo "Response: "
   echo "$RLT" | jq .
   exit 1
 fi

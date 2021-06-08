@@ -38,6 +38,4 @@ echo "GIT_TAG_RELEASE_LATEST=$GIT_TAG_RELEASE_LATEST" >> $env:GITHUB_ENV
 echo "GIT_TAG_LATEST=$GIT_TAG_LATEST" >> $env:GITHUB_ENV
 echo "Latest Tag: $GIT_TAG_LATEST"
 
-echo "::error file=app.js,line=10,col=15::Something went wrong"
-exit 1
 echo "::set-output name=git-branch::$GIT_BRANCH"
