@@ -1,7 +1,9 @@
 # 构建前检查
 
 $NOT_PASSED = 0
-echo "Build Version: v${Env:BUILD_VERSION}`nCurrent Tag: ${Env:GIT_TAG}`nLatest Tag: ${Env:GIT_TAG_LATEST}`n"
+echo "Build Version: v${Env:BUILD_VERSION}`nCurrent Tag: ${Env:GIT_TAG}"
+echo "Latest Tag: ${Env:GIT_TAG_LATEST}`nLatest Release Tag: ${Env:GIT_TAG_RELEASE_LATEST}`nLatest Pre Tag: ${Env:GIT_TAG_PRE_LATEST}"
+
 if (!(${Env:GIT_TAG} -match ${Env:VERSION_REGEXP}) -or ${Env:GIT_TAG} -eq "")
 {
     $NOT_PASSED = 1
@@ -52,8 +54,10 @@ if (($NOT_PASSED -eq 0) -and (($productVersion -ne $fileVersion) -or (${Env:BUIL
     $NOT_PASSED = 1
     echo "The version information has some differences.`nPlease check `"versioninfo.json`""
 }
+(git tag -l | where { $_ -eq "v0.1.3.21-pre" }).Count
 
-if (($NOT_PASSED -eq 0) -and ((${Env:GIT_TAG_RELEASE_LATEST} -ne "" -and ${Env:GIT_TAG} -eq ${Env:GIT_TAG_RELEASE_LATEST}) -or
+if (($NOT_PASSED -eq 0) -and (((git tag -l | where { $_ -eq ${Env:GIT_TAG} }).Count) -gt 0 -or
+        (${Env:GIT_TAG_RELEASE_LATEST} -ne "" -and ${Env:GIT_TAG} -eq ${Env:GIT_TAG_RELEASE_LATEST}) -or
         (${Env:GIT_TAG_PRE_LATEST} -ne "" -and ${Env:GIT_TAG} -eq ${Env:GIT_TAG_PRE_LATEST}) -or
         (${Env:GIT_TAG_LATEST} -ne "" -and (${Env:GIT_TAG}.replace("-pre", "") -lt ${Env:GIT_TAG_LATEST}.replace("-pre", "") -or
                 (${Env:GIT_TAG}.replace("-pre", "") -eq ${Env:GIT_TAG_LATEST}.replace("-pre", "") -and
