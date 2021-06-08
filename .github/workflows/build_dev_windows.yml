@@ -49,12 +49,6 @@ jobs:
         shell: pwsh
         run: pwsh -f ./.github/scripts/steps/build/2_configuration.ps1
 
-      # 构建前检查
-      - name: Check on Failures ❌
-        if: success()
-        shell: pwsh
-        run: pwsh -f ./.github/scripts/steps/build/3_checks.ps1
-
       # 配置Golang环境
       - name: Setup Go Environment 📍
         uses: actions/setup-go@v2
