@@ -133,7 +133,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.BUILD_X64_FILENAME }}
+          name: ${{ env.BUILD_X64_FILENAME }}.sha256
           path: ${{ env.PUBLISH_PATH }}/*_x64.exe.sha256
           if-no-files-found: error
           retention-days: ${{ env.artifact-retention-days }}
@@ -143,7 +143,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.BUILD_X86_FILENAME }}
+          name: ${{ env.BUILD_X86_FILENAME }}.sha256
           path: ${{ env.PUBLISH_PATH }}/*_x86.exe.sha256
           if-no-files-found: error
           retention-days: ${{ env.artifact-retention-days }}
