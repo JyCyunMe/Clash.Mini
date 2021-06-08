@@ -185,11 +185,11 @@ jobs:
         run: bash ./.github/scripts/steps/notification/2_push_files_tg_dev.sh
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          GIT_BRANCH: ${{ needs.build-release-windows.outputs.git-branch }}
-          GIT_TAG: ${{ needs.build-release-windows.outputs.git-tag }}
+          GIT_BRANCH: ${{ needs.build-dev-windows.outputs.git-branch }}
+          GIT_TAG: ${{ needs.build-dev-windows.outputs.git-tag }}
           ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
-          BUILD_X64_FILENAME: ${{ needs.build-release-windows.outputs.build-x64-filename }}
-          BUILD_X86_FILENAME: ${{ needs.build-release-windows.outputs.build-x86-filename }}
+          BUILD_X64_FILENAME: ${{ needs.build-dev-windows.outputs.build-x64-filename }}
+          BUILD_X86_FILENAME: ${{ needs.build-dev-windows.outputs.build-x86-filename }}
 
 #      # 缓存Build文件
 #      - name: Cache node modules
