@@ -53,8 +53,12 @@ if (($NOT_PASSED -eq 0) -and (($productVersion -ne $fileVersion) -or (${Env:BUIL
     echo "The version information has some differences.`nPlease check `"versioninfo.json`""
 }
 
-if (($NOT_PASSED -eq 0) -and ((${Env:GIT_TAG_LATEST} -ne "" -and ${Env:GIT_TAG}.replace("-pre", "") -lt ${Env:GIT_TAG_LATEST}.replace("-pre", "") -or
-        (${Env:GIT_TAG}.replace("-pre", "") -eq ${Env:GIT_TAG_LATEST}.replace("-pre", "") -and (${Env:GIT_TAG}.contains("-pre") -or !${Env:GIT_TAG_LATEST}.contains("-pre"))))))
+if (($NOT_PASSED -eq 0) -and ((${Env:GIT_TAG_RELEASE_LATEST} -ne "" -and ${Env:GIT_TAG} -eq ${Env:GIT_TAG_RELEASE_LATEST}) -or
+        (${Env:GIT_TAG_PRE_LATEST} -ne "" -and ${Env:GIT_TAG} -eq ${Env:GIT_TAG_PRE_LATEST}) -or
+        (${Env:GIT_TAG_LATEST} -ne "" -and (${Env:GIT_TAG}.replace("-pre", "") -lt ${Env:GIT_TAG_LATEST}.replace("-pre", "") -or
+                (${Env:GIT_TAG}.replace("-pre", "") -eq ${Env:GIT_TAG_LATEST}.replace("-pre", "") -and
+                        (${Env:GIT_TAG}.contains("-pre") -or !${Env:GIT_TAG_LATEST}.contains("-pre"))))
+        )))
 {
     $NOT_PASSED = 1
     echo "A newer or the current version already exists."
