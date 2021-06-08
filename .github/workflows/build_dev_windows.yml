@@ -105,7 +105,7 @@ jobs:
         if: success()
         shell: pwsh
         run: |
-          ls $env:PUBLISH_PATH -Include "*.exe" -Recurse | for { echo (Get-FileHash $_.FullName -Algorithm SHA256).Hash > "$($_.FullName).sha256" }
+          ls $env:PUBLISH_PATH -Include "*.exe" -Recurse | foreach { echo (Get-FileHash $_.FullName -Algorithm SHA256).Hash > "$($_.FullName).sha256" }
           ls $env:PUBLISH_PATH
 
       # 上传64位应用到Actions Artifacts
