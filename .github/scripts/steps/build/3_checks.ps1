@@ -9,7 +9,6 @@ if (!(${Env:GIT_TAG} -match ${Env:VERSION_REGEXP}) -or ${Env:GIT_TAG} -eq "")
     $NOT_PASSED = 1
     echo "Cannot get the version information or it's incorrect."
 }
-echo "::error file=app.js,line=10,col=15::Something went wrong"
 if ($NOT_PASSED -eq 0)
 {
     $INTERNAL_VERSION_REGEXP = "^(\d+\.\d+\.\d+)(\.\d+)?$"
