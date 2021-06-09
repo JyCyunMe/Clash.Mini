@@ -16,7 +16,7 @@ RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_BOT_TOKEN}
 IS_OK=$(echo $RLT | jq ".ok")
 echo $RLT | jq .
 if ! $IS_OK; then
-  echo "::error file=scripts/steps/notification/2_push_files_tg.sh,line=71,col=1::pushing files to channel failed."
+  echo "::error file=scripts/steps/notification/2_push_files_tg_dev.sh,line=19,col=1::pushing files to channel failed."
   echo "Response: "
   echo $RLT | jq .
   exit 1
