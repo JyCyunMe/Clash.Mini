@@ -150,10 +150,11 @@ jobs:
 
   notifaction:
     name: Notification
+    environment: dev
     runs-on: ubuntu-latest
     needs: build-dev-windows
     env:
-      UPLOAD_CHAT_ID: ${{ env.UPLOAD_CHAT_ID }}
+      UPLOAD_CHAT_ID: ${{ secrets.UPLOAD_CHAT_ID }}
     steps:
       # 拉取项目代码
       - name: Checkout 🔀
@@ -184,7 +185,7 @@ jobs:
         shell: bash
         run: bash ./.github/scripts/steps/notification/2_push_files_tg_dev.sh
         env:
-          TG_BOT_TOKEN: ${{ env.TG_BOT_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           GIT_BRANCH: ${{ needs.build-dev-windows.outputs.git-branch }}
           GIT_TAG: ${{ needs.build-dev-windows.outputs.git-tag }}
           ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
