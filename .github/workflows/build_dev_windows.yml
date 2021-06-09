@@ -15,6 +15,7 @@ env:
 jobs:
   build-dev-windows:
     name: Build Dev Windows
+    environment: dev
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '[Skip CI]') }}
     outputs:
@@ -184,7 +185,6 @@ jobs:
         run: bash ./.github/scripts/steps/notification/2_push_files_tg_dev.sh
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          UPLOAD_CHAT_ID: ${{ secrets.UPLOAD_CHAT_ID }}
           GIT_BRANCH: ${{ needs.build-dev-windows.outputs.git-branch }}
           GIT_TAG: ${{ needs.build-dev-windows.outputs.git-tag }}
           ARTIFACTS_PATH: ${{ steps.download-artifacts.outputs.download-path }}
