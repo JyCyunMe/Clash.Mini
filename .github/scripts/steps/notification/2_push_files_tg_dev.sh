@@ -17,7 +17,7 @@ RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_BOT_TOKEN}
 #RLT=$(curl --location --request POST https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMediaGroup -s --form-string chat_id=${UPLOAD_CHAT_ID} --form $PART_X64=@"${ARTIFACTS_PATH}/${BUILD_X64_FILENAME}/${BUILD_X64_FILENAME}" --form $PART_X86=@"${ARTIFACTS_PATH}/${BUILD_X86_FILENAME}/${BUILD_X86_FILENAME}" --form-string media="[{\"type\": \"document\",\"media\": \"attach://$PART_X64\",\"caption\": \"SHA256: ${ARTIFACT_X64_SHA256}\n\n_[${GITHUB_WORKFLOW} #${GITHUB_RUN_NUMBER}](${RUNNER_URL})_\",\"parse_mode\": \"Markdown\"},{\"type\": \"document\",\"media\": \"attach://$PART_X86\",\"caption\": \"SHA256: ${ARTIFACT_X86_SHA256}\n\n_[${GITHUB_WORKFLOW} #${GITHUB_RUN_NUMBER}](${RUNNER_URL})_\",\"parse_mode\": \"Markdown\"}]")
 IS_OK=$(echo $RLT | jq ".ok")
 echo $RLT | jq .
-if [ ! $IS_OK ]; then
+if ! $IS_OK; then
   echo "::error file=scripts/steps/notification/2_push_files_tg.sh,line=71,col=1::pushing files to channel failed."
   echo "Response: "
   echo $RLT | jq .
